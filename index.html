@@ -937,7 +937,7 @@
   </div>
 
   <script>
-    const tg = window.Telegram?.WebApp;
+    const tg = window.Telegram && window.Telegram.WebApp;
     if (tg) {
       tg.ready();
       tg.expand();
@@ -950,14 +950,14 @@
 
     function resolveTelegramUser() {
       let uid = "";
-      if (tg?.initDataUnsafe?.user?.id) uid = String(tg.initDataUnsafe.user.id);
-      if (!uid && tg?.initData) {
+      if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) uid = String(tg.initDataUnsafe.user.id);
+      if (!uid && tg && tg.initData) {
         try {
           const p = new URLSearchParams(tg.initData);
           const uStr = p.get('user');
           if (uStr) {
             const parsed = JSON.parse(decodeURIComponent(uStr));
-            if (parsed?.id) uid = String(parsed.id);
+            if (parsed && parsed.id) uid = String(parsed.id);
           }
         } catch (e) {}
       }
@@ -1161,20 +1161,20 @@
           return new Date(`${dateStr}T${cleanTime}Z`);
         };
 
-        const isSprintWeekend = !!(raceData.Sprint?.date || raceData.SprintQualifying?.date);
+        const isSprintWeekend = !!(raceData.Sprint && raceData.Sprint.date || raceData.SprintQualifying && raceData.SprintQualifying.date);
 
         if (isSprintWeekend) {
-          if (raceData.FirstPractice?.date) sessions.push({ name: "Практика 1", short: "П1", date: parseLocalDateTime(raceData.FirstPractice.date, raceData.FirstPractice.time), duration: 60 });
+          if (raceData.FirstPractice && raceData.FirstPractice.date) sessions.push({ name: "Практика 1", short: "П1", date: parseLocalDateTime(raceData.FirstPractice.date, raceData.FirstPractice.time), duration: 60 });
           const sqData = raceData.SprintQualifying || raceData.Qualifying; 
-          if (sqData?.date) sessions.push({ name: "Квалификация к спринту", short: "КВАЛА С", date: parseLocalDateTime(sqData.date, sqData.time), duration: 45 });
-          if (raceData.Sprint?.date) sessions.push({ name: "Спринт", short: "СПРИНТ", date: parseLocalDateTime(raceData.Sprint.date, raceData.Sprint.time), duration: 60 });
-          if (raceData.Qualifying?.date) sessions.push({ name: "Квалификация к гонке", short: "КВАЛА", date: parseLocalDateTime(raceData.Qualifying.date, raceData.Qualifying.time), duration: 60 });
+          if (sqData && sqData.date) sessions.push({ name: "Квалификация к спринту", short: "КВАЛА С", date: parseLocalDateTime(sqData.date, sqData.time), duration: 45 });
+          if (raceData.Sprint && raceData.Sprint.date) sessions.push({ name: "Спринт", short: "СПРИНТ", date: parseLocalDateTime(raceData.Sprint.date, raceData.Sprint.time), duration: 60 });
+          if (raceData.Qualifying && raceData.Qualifying.date) sessions.push({ name: "Квалификация к гонке", short: "КВАЛА", date: parseLocalDateTime(raceData.Qualifying.date, raceData.Qualifying.time), duration: 60 });
           if (raceData.date) sessions.push({ name: "Гонка", short: "ГОНКА", date: parseLocalDateTime(raceData.date, raceData.time), duration: 120 });
         } else {
-          if (raceData.FirstPractice?.date) sessions.push({ name: "Практика 1", short: "П1", date: parseLocalDateTime(raceData.FirstPractice.date, raceData.FirstPractice.time), duration: 60 });
-          if (raceData.SecondPractice?.date) sessions.push({ name: "Практика 2", short: "П2", date: parseLocalDateTime(raceData.SecondPractice.date, raceData.SecondPractice.time), duration: 60 });
-          if (raceData.ThirdPractice?.date) sessions.push({ name: "Практика 3", short: "П3", date: parseLocalDateTime(raceData.ThirdPractice.date, raceData.ThirdPractice.time), duration: 60 });
-          if (raceData.Qualifying?.date) sessions.push({ name: "Квалификация", short: "КВАЛА", date: parseLocalDateTime(raceData.Qualifying.date, raceData.Qualifying.time), duration: 60 });
+          if (raceData.FirstPractice && raceData.FirstPractice.date) sessions.push({ name: "Практика 1", short: "П1", date: parseLocalDateTime(raceData.FirstPractice.date, raceData.FirstPractice.time), duration: 60 });
+          if (raceData.SecondPractice && raceData.SecondPractice.date) sessions.push({ name: "Практика 2", short: "П2", date: parseLocalDateTime(raceData.SecondPractice.date, raceData.SecondPractice.time), duration: 60 });
+          if (raceData.ThirdPractice && raceData.ThirdPractice.date) sessions.push({ name: "Практика 3", short: "П3", date: parseLocalDateTime(raceData.ThirdPractice.date, raceData.ThirdPractice.time), duration: 60 });
+          if (raceData.Qualifying && raceData.Qualifying.date) sessions.push({ name: "Квалификация", short: "КВАЛА", date: parseLocalDateTime(raceData.Qualifying.date, raceData.Qualifying.time), duration: 60 });
           if (raceData.date) sessions.push({ name: "Гонка", short: "ГОНКА", date: parseLocalDateTime(raceData.date, raceData.time), duration: 120 });
         }
       }
@@ -1285,7 +1285,7 @@
         w.classList.add('done');
         w.innerText = '✅';
         wheelsDone++;
-        if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
 
         if (wheelsDone === 4) {
           pitstopActive = false;
@@ -1293,7 +1293,7 @@
           const resEl = document.getElementById('pitstopTimerDisplay');
           resEl.innerText = `🏁 ПИТ-СТОП: ${totalSec} сек!`;
           resEl.style.color = totalSec < 2.3 ? '#28a745' : 'var(--accent)';
-          if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+          if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
       }
     }
@@ -1330,7 +1330,7 @@
       }
 
       const currentRound = window.activeRaceRound || "17"; 
-      const tgUser = tg?.initDataUnsafe?.user || {};
+      const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user || {};
 
       try {
         const res = await fetch(`${WORKER_URL}/api/prediction/submit`, {
@@ -1353,7 +1353,7 @@
           const resBox = document.getElementById('predictionResultBox');
           resBox.style.display = 'block';
           resBox.innerText = `✅ Прогноз успешно принят сервером: ${chosen}`;
-          if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+          if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
           loadPredictionLeaderboard();
         } else {
           alert("Ошибка соединения. Попробуйте еще раз!");
@@ -1503,7 +1503,7 @@
 
     let brandClickCount = 0;
     let brandClickTimer = null;
-    document.getElementById('topBrandLogo')?.addEventListener('click', () => {
+    var topBrandLogo = document.getElementById('topBrandLogo'); if(topBrandLogo) topBrandLogo.addEventListener('click', () => {
       brandClickCount++;
       clearTimeout(brandClickTimer);
       brandClickTimer = setTimeout(() => { brandClickCount = 0; }, 1000);
@@ -1627,7 +1627,7 @@
     }
 
     function switchMainTab(tabName, btnEl) {
-      if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+      if (tg && tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
       document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
       if (btnEl) btnEl.classList.add('active');
 
@@ -1934,9 +1934,9 @@
         b.className = 'menu-btn';
         b.innerHTML = `<span>${it.item}</span><span class="badge">${it.badge || '1080p'}</span>`;
         b.onclick = () => {
-          if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-          tg?.openTelegramLink(`https://t.me/${BOT_USERNAME}?start=${it.code}`);
-          tg?.close();
+          if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+          tg && tg.openTelegramLink && tg.openTelegramLink(`https://t.me/${BOT_USERNAME}?start=${it.code}`);
+          tg && tg.close && tg.close();
         };
         btnsBox.appendChild(b);
       });
@@ -1971,8 +1971,8 @@
         b.className = 'menu-btn';
         b.innerHTML = `<span>${e.title} — ${e.item}</span><span class="badge">${e.badge || '1080p'}</span>`;
         b.onclick = () => {
-          tg?.openTelegramLink(`https://t.me/${BOT_USERNAME}?start=${e.code}`);
-          tg?.close();
+          tg && tg.openTelegramLink && tg.openTelegramLink(`https://t.me/${BOT_USERNAME}?start=${e.code}`);
+          tg && tg.close && tg.close();
         };
         res.appendChild(b);
       });
@@ -2243,7 +2243,7 @@
       } catch (e) {}
     }
 
-    document.getElementById('deployV2Btn')?.addEventListener('click', async () => {
+    var deployV2Btn = document.getElementById('deployV2Btn'); if(deployV2Btn) deployV2Btn.addEventListener('click', async () => {
       if (!confirm("Переключить версию для всех пользователей на V2?")) return;
       
       try {
@@ -2317,7 +2317,7 @@
     let f1Timeout = null;
     let f1Interval = null;
 
-    document.getElementById('f1LightsBtn')?.addEventListener('click', () => {
+    var f1LightsBtn = document.getElementById('f1LightsBtn'); if(f1LightsBtn) f1LightsBtn.addEventListener('click', () => {
       const btn = document.getElementById('f1LightsBtn');
       const lights = document.querySelectorAll('.f1-light');
       const resultDiv = document.getElementById('f1LightsResult');
