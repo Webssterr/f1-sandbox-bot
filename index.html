@@ -803,6 +803,17 @@
       <input class="search-input" id="admFormCode" placeholder="Код выдачи (bahrain26_race)">
       <input type="number" class="search-input" id="admFormPostId" placeholder="ID поста на канале-складе">
 
+      <div class="setting-item" style="border:none; padding: 4px 0 16px 0;">
+        <div>
+          <div class="set-lbl">Сделать рассылку в Telegram</div>
+          <div class="set-sub" style="font-size:11px;">Уведомить подписчиков бота о новом контенте</div>
+        </div>
+        <label class="switch-toggle">
+          <input type="checkbox" id="admFormNotifyUser">
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+
       <button class="btn-action" id="adminSubmitRecordBtn" onclick="submitCatalogRecordForm()">💾 Сохранить запись</button>
       <button class="btn-action btn-secondary" id="adminCancelEditBtn" style="display:none; margin-top:8px;" onclick="cancelCatalogEditMode()">Отмена</button>
     </div>
@@ -823,18 +834,72 @@
 
   <!-- ================= 7. ЭКРАН: ГАРАЖ (3D) ================= -->
   <div id="view-garage" class="view-screen">
-    <div class="hero-card" style="padding: 0; position: relative; height: 350px;">
+    <!-- ПРЕМИАЛЬНЫЙ 3D-ГАРАЖ -->
+    <div class="hero-card" style="padding: 0; position: relative; height: 320px; background: linear-gradient(180deg, #1f2330 0%, #0a0b10 100%);">
       <div id="garage-3d-container" style="width:100%; height:100%;"></div>
-      <div style="position: absolute; top: 15px; left: 15px; font-size: 14px; font-weight: 800; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); z-index: 10;">
-        МОЯ КОМАНДА (3D)
+      <div style="position: absolute; top: 15px; left: 15px; font-size: 14px; font-weight: 800; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.8); z-index: 10; display:flex; align-items:center; gap:8px;">
+        <span style="display:inline-block; width:8px; height:8px; background:var(--accent); border-radius:50%; box-shadow:0 0 8px var(--accent);"></span>
+        МОЙ ГАРАЖ
+      </div>
+      <div style="position: absolute; bottom: 15px; right: 15px; text-align: right; z-index: 10;">
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted);">RANK</div>
+        <div style="font-size: 18px; font-weight: 900; color: var(--text);" id="garageUserRank">Картингист</div>
       </div>
     </div>
+
+    <!-- БЛОК ПРОФИЛЯ -->
     <div class="hero-card">
-      <h3 style="margin:0 0 6px 0; font-size:18px; font-weight:900;">Болид следующего поколения</h3>
-      <div style="font-size:13px; color:var(--text-muted); line-height:1.4;">
-        Крутите 3D-модель пальцем. Эта секция использует возможности аппаратного ускорения Three.js.
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+        <div id="garageAvatar" style="width:54px; height:54px; border-radius:14px; background:var(--card-sub); border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:24px;">👤</div>
+        <div style="flex:1;">
+          <h3 style="margin:0; font-size:18px; font-weight:900;" id="garageUserName">Гонщик F1</h3>
+          <div style="font-size:12px; color:var(--text-muted); font-weight:700; display:flex; align-items:center; gap:4px; margin-top:4px;">
+            <span>Баланс:</span> <span style="color:#ffcc00; font-weight:900;" id="garageCoinBalance">0</span> 🪙
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:11px; font-weight:700; color:var(--text-muted); display:flex; justify-content:space-between; margin-bottom:6px;">
+        <span>Прогресс до Ф-3</span>
+        <span id="garageProgressText">0 / 100</span>
+      </div>
+      <div style="width:100%; height:8px; background:var(--card-sub); border-radius:4px; overflow:hidden;">
+        <div id="garageProgressBar" style="width:0%; height:100%; background:var(--accent); transition:width 0.5s ease;"></div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-top:16px; border-top:1px solid var(--border); padding-top:16px;">
+        <div style="text-align:center;">
+          <div style="font-size:20px; font-weight:900; color:var(--text);" id="statViews">0</div>
+          <div style="font-size:10px; color:var(--text-muted); font-weight:700;">ПРОСМОТРОВ</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:20px; font-weight:900; color:var(--text);" id="statQuiz">0%</div>
+          <div style="font-size:10px; color:var(--text-muted); font-weight:700;">ПРАВИЛЬНО</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:20px; font-weight:900; color:#ff8c00;" id="statStreak">0 🔥</div>
+          <div style="font-size:10px; color:var(--text-muted); font-weight:700;">STREAK</div>
+        </div>
       </div>
     </div>
+
+    <!-- КОМНАТА ТРОФЕЕВ (АЧИВКИ) -->
+    <div class="hero-card">
+      <h3 style="margin:0 0 14px 0; font-size:16px; font-weight:900;">🏆 Комната трофеев</h3>
+      <div id="achievementsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(60px, 1fr)); gap:12px;">
+        <!-- Ачивки будут генерироваться через JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- АНИМИРОВАННЫЙ ТОСТ АЧИВОКИ -->
+  <div id="achievementToast" style="position:fixed; top:-100px; left:50%; transform:translateX(-50%); width:90%; max-width:400px; background:rgba(22, 24, 32, 0.95); backdrop-filter:blur(10px); border:1px solid var(--accent); border-radius:16px; padding:16px; display:flex; align-items:center; gap:16px; z-index:99999; transition:top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow:0 10px 30px rgba(255,0,0,0.2);">
+    <div id="toastIcon" style="width:40px; height:40px; border-radius:50%; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-size:20px;">🏆</div>
+    <div style="flex:1;">
+      <div style="font-size:11px; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:0.5px;">Достижение разблокировано!</div>
+      <div id="toastTitle" style="font-size:15px; font-weight:900; color:var(--text); margin-top:2px;">Название</div>
+    </div>
+    <div id="toastReward" style="font-size:16px; font-weight:900; color:#ffcc00;">+50 🪙</div>
   </div>
 
   <!-- НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ (5 ВКЛАДОК) -->
@@ -1045,8 +1110,14 @@
       let pathLength = 1000;
       try { pathLength = pathEl.getTotalLength(); } catch (e) {}
 
+      const gravelGfx = new PIXI.Graphics();
+      gravelGfx.lineStyle(16, 0x11131a, 1, 0.5, true); // Dark gravel/run-off border
+
+      const kerbGfx = new PIXI.Graphics();
+      kerbGfx.lineStyle(10, 0xff0000, 0.8, 0.5, true); // Red kerb accent under asphalt
+
       const trackGfx = new PIXI.Graphics();
-      trackGfx.lineStyle(6, 0x1f2330, 1, 0.5, true); // Track base
+      trackGfx.lineStyle(8, 0x1f2330, 1, 0.5, true); // Track asphalt
 
       const racingLineGfx = new PIXI.Graphics();
       racingLineGfx.lineStyle(2, 0xffffff, 0.5, 0.5, true); // Racing line
@@ -1058,9 +1129,21 @@
           const px = (pt.x - cx) * scale;
           const py = (pt.y - cy) * scale;
           if (i === 0) {
+            gravelGfx.moveTo(px, py);
+            kerbGfx.moveTo(px, py);
             trackGfx.moveTo(px, py);
             racingLineGfx.moveTo(px, py);
           } else {
+            gravelGfx.lineTo(px, py);
+
+            // Dashed kerb effect logic
+            if (Math.floor(i / 15) % 2 === 0) {
+                kerbGfx.lineStyle(10, 0xffffff, 0.8, 0.5, true);
+            } else {
+                kerbGfx.lineStyle(10, 0xff0000, 0.8, 0.5, true);
+            }
+            kerbGfx.lineTo(px, py);
+
             trackGfx.lineTo(px, py);
             racingLineGfx.lineTo(px, py);
           }
@@ -1071,12 +1154,16 @@
         const startPt = pathEl.getPointAtLength(0);
         const px = (startPt.x - cx) * scale;
         const py = (startPt.y - cy) * scale;
+        gravelGfx.lineTo(px, py);
+        kerbGfx.lineTo(px, py);
         trackGfx.lineTo(px, py);
         racingLineGfx.lineTo(px, py);
       } catch(e){}
 
-      pixiTrackLayer.addChildAt(trackGfx, 0);
-      pixiTrackLayer.addChildAt(racingLineGfx, 1);
+      pixiTrackLayer.addChildAt(gravelGfx, 0);
+      pixiTrackLayer.addChildAt(kerbGfx, 1);
+      pixiTrackLayer.addChildAt(trackGfx, 2);
+      pixiTrackLayer.addChildAt(racingLineGfx, 3);
 
 
       let currentDistance = 0;
@@ -1530,70 +1617,117 @@
 
       // 1. Scene
       threeScene = new THREE.Scene();
-      threeScene.background = new THREE.Color(0x11131a); // Match dark theme card bg
 
       // 2. Camera
       const width = container.clientWidth || 300;
       const height = container.clientHeight || 350;
       threeCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-      threeCamera.position.set(3, 2, 4);
-      threeCamera.lookAt(0, 0, 0);
+      threeCamera.position.set(4, 2, 5);
+      threeCamera.lookAt(0, 0.5, 0);
 
-      // 3. Renderer
+      // 3. Renderer (with premium settings)
       threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       threeRenderer.setSize(width, height);
       threeRenderer.setPixelRatio(window.devicePixelRatio || 1);
+      // Tone mapping for realistic PBR
+      threeRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+      threeRenderer.toneMappingExposure = 1.2;
       container.appendChild(threeRenderer.domElement);
 
-      // 4. Lights
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      // 4. Premium Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
       threeScene.add(ambientLight);
 
-      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-      dirLight.position.set(5, 10, 7);
-      threeScene.add(dirLight);
+      const mainLight = new THREE.DirectionalLight(0xffffff, 2.5);
+      mainLight.position.set(5, 10, 7);
+      threeScene.add(mainLight);
 
-      // 5. Placeholder Model (e.g. a stylized "car" made of basic geometry)
+      // Neon rim lights for styling
+      const redLight = new THREE.PointLight(0xff0000, 50, 10);
+      redLight.position.set(-3, 1, -3);
+      threeScene.add(redLight);
+
+      const blueLight = new THREE.PointLight(0x0088ff, 50, 10);
+      blueLight.position.set(3, 1, 3);
+      threeScene.add(blueLight);
+
+      // 5. PBR Model (Premium stylization)
       const group = new THREE.Group();
 
-      const bodyGeo = new THREE.BoxGeometry(2, 0.5, 1);
-      const bodyMat = new THREE.MeshStandardMaterial({ color: 0xff0000, metalness: 0.7, roughness: 0.2 });
+      // Carbon fiber-like dark chassis
+      const bodyGeo = new THREE.BoxGeometry(2.4, 0.3, 1.1);
+      const bodyMat = new THREE.MeshStandardMaterial({
+          color: 0x111111,
+          metalness: 0.8,
+          roughness: 0.3,
+          envMapIntensity: 1.0
+      });
       const body = new THREE.Mesh(bodyGeo, bodyMat);
-      body.position.y = 0.5;
+      body.position.y = 0.4;
       group.add(body);
 
-      const cockpitGeo = new THREE.BoxGeometry(0.8, 0.4, 0.6);
-      const cockpitMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.9, roughness: 0.1 });
+      // Aerodynamic nose
+      const noseGeo = new THREE.CylinderGeometry(0.3, 0.55, 0.8, 4);
+      noseGeo.rotateZ(Math.PI / 2);
+      noseGeo.rotateX(Math.PI / 4);
+      const nose = new THREE.Mesh(noseGeo, bodyMat);
+      nose.position.set(-1.6, 0.4, 0);
+      group.add(nose);
+
+      // Bright red accent line
+      const accentGeo = new THREE.BoxGeometry(1.8, 0.05, 1.12);
+      const accentMat = new THREE.MeshStandardMaterial({ color: 0xff0000, metalness: 0.5, roughness: 0.2 });
+      const accent = new THREE.Mesh(accentGeo, accentMat);
+      accent.position.set(0, 0.45, 0);
+      group.add(accent);
+
+      // Cockpit halo
+      const cockpitGeo = new THREE.BoxGeometry(0.8, 0.3, 0.6);
+      const cockpitMat = new THREE.MeshStandardMaterial({ color: 0x050505, metalness: 0.9, roughness: 0.1 });
       const cockpit = new THREE.Mesh(cockpitGeo, cockpitMat);
-      cockpit.position.set(-0.2, 0.9, 0);
+      cockpit.position.set(0, 0.7, 0);
       group.add(cockpit);
 
-      // Simple wheels
-      const wheelGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.2, 16);
+      // Rear wing
+      const wingGeo = new THREE.BoxGeometry(0.3, 0.05, 1.2);
+      const wing = new THREE.Mesh(wingGeo, accentMat);
+      wing.position.set(1.1, 0.8, 0);
+      group.add(wing);
+
+      const wingSupport = new THREE.BoxGeometry(0.1, 0.4, 0.6);
+      const wingSupMesh = new THREE.Mesh(wingSupport, bodyMat);
+      wingSupMesh.position.set(1.1, 0.6, 0);
+      group.add(wingSupMesh);
+
+      // Wide PBR tires
+      const wheelGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.35, 32);
       wheelGeo.rotateX(Math.PI / 2);
-      const wheelMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.9 });
+      const wheelMat = new THREE.MeshStandardMaterial({ color: 0x151515, roughness: 0.9, metalness: 0.1 });
+      const rimMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.4, metalness: 0.8 });
 
-      const w1 = new THREE.Mesh(wheelGeo, wheelMat);
-      w1.position.set(0.6, 0.3, 0.6);
-      group.add(w1);
+      const addWheel = (x, z) => {
+          const w = new THREE.Mesh(wheelGeo, wheelMat);
+          w.position.set(x, 0.35, z);
+          // Add rim
+          const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.36, 16), rimMat);
+          rim.rotateX(Math.PI / 2);
+          w.add(rim);
+          group.add(w);
+      };
 
-      const w2 = new THREE.Mesh(wheelGeo, wheelMat);
-      w2.position.set(0.6, 0.3, -0.6);
-      group.add(w2);
-
-      const w3 = new THREE.Mesh(wheelGeo, wheelMat);
-      w3.position.set(-0.7, 0.3, 0.6);
-      group.add(w3);
-
-      const w4 = new THREE.Mesh(wheelGeo, wheelMat);
-      w4.position.set(-0.7, 0.3, -0.6);
-      group.add(w4);
+      addWheel(0.9, 0.7);
+      addWheel(0.9, -0.7);
+      addWheel(-1.0, 0.7);
+      addWheel(-1.0, -0.7);
 
       garageModel = group;
       threeScene.add(garageModel);
 
-      // Add a grid helper for "garage floor" feel
-      const grid = new THREE.GridHelper(10, 20, 0x333333, 0x222222);
+      // Add a premium glowing grid helper
+      const grid = new THREE.GridHelper(20, 40, 0xff0000, 0x1f2330);
+      grid.position.y = 0.01;
+      grid.material.opacity = 0.4;
+      grid.material.transparent = true;
       threeScene.add(grid);
 
       // 6. Animation Loop
@@ -2139,6 +2273,7 @@
       document.getElementById('admFormBadge').value = '1080p';
       document.getElementById('admFormCode').value = '';
       document.getElementById('admFormPostId').value = '';
+      document.getElementById('admFormNotifyUser').checked = false;
       document.getElementById('admImgPreviewBox').style.display = 'none';
 
       document.getElementById('adminFormHeaderTitle').innerText = '➕ Добавить запись в базу D1';
@@ -2157,6 +2292,7 @@
         badge: document.getElementById('admFormBadge').value,
         code: document.getElementById('admFormCode').value,
         post_id: document.getElementById('admFormPostId').value,
+        notify_users: document.getElementById('admFormNotifyUser').checked
       };
 
       if (!payload.category || !payload.title || !payload.item || !payload.code || !payload.post_id) {
@@ -2197,6 +2333,103 @@
         if (data.success) loadCatalogDatabase();
       } catch (err) {}
     }
+
+    const ACHIEVEMENTS_DB = [
+      { id: 'first_drive', title: 'Первый выезд', desc: 'Открыл мини-апп', icon: '🏁', reward: 10 },
+      { id: 'night_mech', title: 'Ночной механик', desc: 'Зашел с 03:00 до 05:00', icon: '🦉', reward: 50 },
+      { id: 'monaco_prophet', title: 'Пророк Монако', desc: 'Угадал победителя в Монако', icon: '👑', reward: 100 },
+      { id: 'marathon', title: 'Марафонец', desc: 'Посмотрел 10 видео', icon: '🍿', reward: 75 },
+      { id: 'pole_pos', title: 'Поул-позиция', desc: 'Зашел за 5 мин до гонки', icon: '⏱️', reward: 50 },
+      { id: 'pit_crash', title: 'Авария на пит-лейне', desc: 'Провален Pit-Stop Challenge', icon: '💥', reward: 5 },
+      { id: 'archivist', title: 'Архивариус', desc: 'Открыл сезон 1990+', icon: '📼', reward: 30 },
+      { id: 'wall_of_champs', title: 'Стена чемпионов', desc: 'Нашел секрет', icon: '🧱', reward: 200 },
+      { id: 'quiz_king', title: 'Король прогнозов', desc: '5 верных квизов подряд', icon: '🧠', reward: 150 },
+      { id: 'fanatic', title: 'Фанатичная преданность', desc: 'Стрик 7 дней', icon: '🔥', reward: 300 }
+    ];
+
+    let userUnlockedAchievements = []; // Will be loaded from D1/localStorage
+    let userCoins = 0;
+
+    function renderTrophyRoom() {
+      const grid = document.getElementById('achievementsGrid');
+      if (!grid) return;
+      grid.innerHTML = ACHIEVEMENTS_DB.map(a => {
+        const isUnlocked = userUnlockedAchievements.includes(a.id);
+        return `
+          <div style="text-align:center; opacity: ${isUnlocked ? '1' : '0.4'}; filter: ${isUnlocked ? 'none' : 'grayscale(1)'};">
+            <div style="width:100%; aspect-ratio:1; border-radius:16px; background:var(--card-sub); border:2px solid ${isUnlocked ? 'var(--accent)' : 'var(--border)'}; display:flex; align-items:center; justify-content:center; font-size:28px; margin-bottom:6px; box-shadow: ${isUnlocked ? '0 4px 12px rgba(255,0,0,0.15)' : 'none'};">
+              ${a.icon}
+            </div>
+            <div style="font-size:9px; font-weight:800; color:var(--text); line-height:1.2; word-break:break-word;">${a.title}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function showAchievementToast(achievementId) {
+      const a = ACHIEVEMENTS_DB.find(x => x.id === achievementId);
+      if (!a || userUnlockedAchievements.includes(a.id)) return;
+
+      userUnlockedAchievements.push(a.id);
+      userCoins += a.reward;
+
+      // Update UI if in garage
+      if(document.getElementById('garageCoinBalance')) {
+          document.getElementById('garageCoinBalance').innerText = userCoins;
+          renderTrophyRoom();
+          updateCareerRank();
+      }
+
+      const toast = document.getElementById('achievementToast');
+      document.getElementById('toastIcon').innerText = a.icon;
+      document.getElementById('toastTitle').innerText = a.title;
+      document.getElementById('toastReward').innerText = `+${a.reward} 🪙`;
+
+      toast.style.top = '20px';
+      if (tg && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred) tg.HapticFeedback.notificationOccurred('success');
+
+      setTimeout(() => {
+        toast.style.top = '-100px';
+      }, 4000);
+    }
+
+    function updateCareerRank() {
+        const ranks = [
+            { name: "Картингист", req: 0, next: 100, nextName: "Ф-3" },
+            { name: "Пилот Ф-3", req: 100, next: 300, nextName: "Ф-2" },
+            { name: "Пилот Ф-2", req: 300, next: 700, nextName: "Тест-пилот" },
+            { name: "Тест-пилот", req: 700, next: 1500, nextName: "Боевой пилот F1" },
+            { name: "Боевой пилот F1", req: 1500, next: 3000, nextName: "Победитель Гран-при" },
+            { name: "Победитель Гран-при", req: 3000, next: 5000, nextName: "Легенда" },
+            { name: "Легенда / Чемпион", req: 5000, next: 5000, nextName: "MAX" }
+        ];
+
+        let currentRank = ranks[0];
+        for(let i=0; i<ranks.length; i++) {
+            if (userCoins >= ranks[i].req) currentRank = ranks[i];
+        }
+
+        const rankEl = document.getElementById('garageUserRank');
+        if(rankEl) rankEl.innerText = currentRank.name;
+
+        let progressPercent = 100;
+        if(currentRank.next > currentRank.req) {
+             progressPercent = Math.min(100, ((userCoins - currentRank.req) / (currentRank.next - currentRank.req)) * 100);
+             const pText = document.getElementById('garageProgressText');
+             if(pText) pText.innerText = `${userCoins} / ${currentRank.next} (до ${currentRank.nextName})`;
+        } else {
+             const pText = document.getElementById('garageProgressText');
+             if(pText) pText.innerText = `Максимальный ранг!`;
+        }
+
+        const bar = document.getElementById('garageProgressBar');
+        if(bar) bar.style.width = `${progressPercent}%`;
+    }
+
+    // Mock initial unlock for demonstration
+    setTimeout(() => {
+        if(Math.random() > 0.5) showAchievementToast('first_drive');
+    }, 3000);
 
     async function initAppRouting() {
       try {
@@ -2275,37 +2508,67 @@
 
       box.innerHTML = categories.map((cat, idx) => `
         <div style="display:flex; justify-content:space-between; align-items:center; background:var(--card-sub); padding:10px 14px; border-radius:12px; border:1px solid var(--border);">
-          <span style="font-size:14px; font-weight:800;">${cat}</span>
-          <div style="display:flex; gap:6px;">
-            <button class="icon-circle-btn" style="width:32px; height:32px; font-size:13px;" onclick="moveCategoryOrder(${idx}, -1)" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>⬆️</button>
-            <button class="icon-circle-btn" style="width:32px; height:32px; font-size:13px;" onclick="moveCategoryOrder(${idx}, 1)" ${idx === categories.length - 1 ? 'disabled style="opacity:0.3"' : ''}>⬇️</button>
+          <span style="font-size:14px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 40%;">${cat}</span>
+          <div style="display:flex; gap:4px;">
+            <button class="icon-circle-btn" style="width:30px; height:30px; font-size:12px;" onclick="moveCategoryOrder(${idx}, 'top')" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>⏫</button>
+            <button class="icon-circle-btn" style="width:30px; height:30px; font-size:12px;" onclick="moveCategoryOrder(${idx}, 'up')" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>⬆️</button>
+            <button class="icon-circle-btn" style="width:30px; height:30px; font-size:12px;" onclick="moveCategoryOrder(${idx}, 'down')" ${idx === categories.length - 1 ? 'disabled style="opacity:0.3"' : ''}>⬇️</button>
+            <button class="icon-circle-btn" style="width:30px; height:30px; font-size:12px;" onclick="moveCategoryOrder(${idx}, 'bottom')" ${idx === categories.length - 1 ? 'disabled style="opacity:0.3"' : ''}>⏬</button>
           </div>
         </div>
       `).join('');
     }
 
-    async function moveCategoryOrder(index, direction) {
+    async function moveCategoryOrder(index, action) {
       const categories = [...new Set(allCatalogItems.map(i => i.category))];
-      const targetIndex = index + direction;
+      const cat = categories[index];
       
-      if (targetIndex < 0 || targetIndex >= categories.length) return;
+      if (action === 'up' && index > 0) {
+        categories[index] = categories[index - 1];
+        categories[index - 1] = cat;
+      } else if (action === 'down' && index < categories.length - 1) {
+        categories[index] = categories[index + 1];
+        categories[index + 1] = cat;
+      } else if (action === 'top' && index > 0) {
+        categories.splice(index, 1);
+        categories.unshift(cat);
+      } else if (action === 'bottom' && index < categories.length - 1) {
+        categories.splice(index, 1);
+        categories.push(cat);
+      } else {
+        return; // No valid move
+      }
 
-      const temp = categories[index];
-      categories[index] = categories[targetIndex];
-      categories[targetIndex] = temp;
-
-      const payloadCategories = categories.map((cat, order) => ({ category: cat, order }));
+      // New backend API payload structure based on the prompt
+      // Prompt mentioned: "endpoint (например, POST /api/admin/reorder), принимающий id элемента, действие ('top', 'up', 'down', 'bottom') и категорию."
+      // Let's send the full mapped order and also action/category to be safe
+      const payloadCategories = categories.map((c, order) => ({ category: c, order }));
 
       try {
-        const res = await fetch(`${WORKER_URL}/api/catalog/reorder`, {
+        const res = await fetch(`${WORKER_URL}/api/admin/reorder`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
-          body: JSON.stringify({ categories: payloadCategories })
+          body: JSON.stringify({
+             action: action,
+             category: cat,
+             // Keeping categories array in payload as a fallback depending on how worker is strictly implemented
+             categories: payloadCategories
+          })
         });
         const data = await res.json();
-        if (data.success) {
+        if (data && data.success) {
           loadCatalogDatabase();
+          // Assuming we rely on D1 response being fast enough, else we re-render locally immediately
           renderAdminCategoriesOrder();
+        } else {
+            // Fallback if /api/admin/reorder doesn't exist, hit the old one
+            await fetch(`${WORKER_URL}/api/catalog/reorder`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
+                body: JSON.stringify({ categories: payloadCategories })
+            });
+            loadCatalogDatabase();
+            renderAdminCategoriesOrder();
         }
       } catch (e) {
         alert("Ошибка при сохранении порядка категорий");
