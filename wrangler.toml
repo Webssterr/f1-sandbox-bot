@@ -17,3 +17,8 @@ binding = "AI"
 # 2. 0 * * * * -> Every hour for notification checks
 [triggers]
 crons = ["0 0 * * *", "0 * * * *"]
+
+[[rules]]
+type = "Text"
+globs = ["**/*.html"]
+fallthrough = true
