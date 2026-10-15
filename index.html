@@ -8,6 +8,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -734,7 +737,19 @@
           <select id="fantasyConstructor" class="prediction-select" style="margin:0;" onchange="updateFantasyBudget()"></select>
         </div>
 
+
         <button class="btn-action" onclick="saveFantasyTeam()">💾 СОХРАНИТЬ СОСТАВ</button>
+
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);">
+          <h4 style="margin:0 0 10px 0; font-size:16px; font-weight:900;">💼 Экономика Босса</h4>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+             <button class="btn-action" style="background:var(--card-sub);" onclick="buyUpgrade('base', 500)">🏭 Прокачка базы (-500 🪙)</button>
+             <button class="btn-action" style="background:var(--card-sub);" onclick="buyUpgrade('scout', 200)">🔍 Скаутинг пилотов F2 (-200 🪙)</button>
+             <button class="btn-action" style="background:var(--card-sub);" onclick="buyUpgrade('livery', 1000)">🎨 Ретро-ливрея для гаража (-1000 🪙)</button>
+             <button class="btn-action" style="background:var(--card-sub);" onclick="buyUpgrade('insider', 100)">📈 Инсайдерская аналитика (-100 🪙)</button>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -1698,106 +1713,48 @@
       blueLight.position.set(3, 1, 3);
       threeScene.add(blueLight);
 
-      // 5. Procedural Detailed PBR F1 Car
-      const group = new THREE.Group();
-
-      const carbonMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.8, roughness: 0.3 });
-      const redPaintMat = new THREE.MeshStandardMaterial({ color: 0xcc0000, metalness: 0.6, roughness: 0.2 });
-      const whitePaintMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.1 });
-
-      // Main Chassis (Aerodynamic Shape)
-      const chassisGeo = new THREE.CylinderGeometry(0.3, 0.5, 2.5, 12, 1, false, 0, Math.PI);
-      chassisGeo.rotateZ(-Math.PI / 2);
-      chassisGeo.scale(1, 0.4, 0.8);
-      const chassis = new THREE.Mesh(chassisGeo, redPaintMat);
-      chassis.position.set(0, 0.3, 0);
-      group.add(chassis);
-
-      // Sidepods
-      const sidepodGeo = new THREE.BoxGeometry(1.2, 0.25, 1.4);
-      const sidepod = new THREE.Mesh(sidepodGeo, redPaintMat);
-      sidepod.position.set(0.2, 0.3, 0);
-      group.add(sidepod);
-
-      // Engine Cover / Fin
-      const finGeo = new THREE.BoxGeometry(0.8, 0.4, 0.05);
-      const fin = new THREE.Mesh(finGeo, whitePaintMat);
-      fin.position.set(0.5, 0.6, 0);
-      group.add(fin);
-
-      // Nose Cone
-      const noseGeo = new THREE.CylinderGeometry(0.1, 0.3, 1.2, 8);
-      noseGeo.rotateZ(-Math.PI / 2);
-      noseGeo.scale(1, 0.3, 1);
-      const nose = new THREE.Mesh(noseGeo, redPaintMat);
-      nose.position.set(-1.6, 0.25, 0);
-      group.add(nose);
-
-      // Front Wing
-      const fWingBaseGeo = new THREE.BoxGeometry(0.3, 0.05, 1.6);
-      const fWingBase = new THREE.Mesh(fWingBaseGeo, carbonMat);
-      fWingBase.position.set(-2.0, 0.15, 0);
-      group.add(fWingBase);
-      const fWingEndplateGeo = new THREE.BoxGeometry(0.4, 0.2, 0.05);
-      const fWingLeft = new THREE.Mesh(fWingEndplateGeo, carbonMat);
-      fWingLeft.position.set(-2.0, 0.2, 0.8);
-      group.add(fWingLeft);
-      const fWingRight = new THREE.Mesh(fWingEndplateGeo, carbonMat);
-      fWingRight.position.set(-2.0, 0.2, -0.8);
-      group.add(fWingRight);
-
-      // Rear Wing
-      const rWingBaseGeo = new THREE.BoxGeometry(0.3, 0.05, 1.2);
-      const rWing = new THREE.Mesh(rWingBaseGeo, carbonMat);
-      rWing.position.set(1.2, 0.7, 0);
-      group.add(rWing);
-      const rWingSupGeo = new THREE.BoxGeometry(0.1, 0.5, 0.4);
-      const rWingSup = new THREE.Mesh(rWingSupGeo, carbonMat);
-      rWingSup.position.set(1.2, 0.45, 0);
-      group.add(rWingSup);
-      const rWingEndplateGeo = new THREE.BoxGeometry(0.4, 0.5, 0.05);
-      const rWingLeft = new THREE.Mesh(rWingEndplateGeo, carbonMat);
-      rWingLeft.position.set(1.2, 0.6, 0.6);
-      group.add(rWingLeft);
-      const rWingRight = new THREE.Mesh(rWingEndplateGeo, carbonMat);
-      rWingRight.position.set(1.2, 0.6, -0.6);
-      group.add(rWingRight);
-
-      // Halo
-      const haloGeo = new THREE.TorusGeometry(0.25, 0.03, 8, 24, Math.PI);
-      haloGeo.rotateX(Math.PI / 2);
-      haloGeo.rotateY(Math.PI / 12);
-      const halo = new THREE.Mesh(haloGeo, carbonMat);
-      halo.position.set(-0.1, 0.55, 0);
-      group.add(halo);
-      const haloSupGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.2);
-      haloSupGeo.rotateZ(Math.PI / 6);
-      const haloSup = new THREE.Mesh(haloSupGeo, carbonMat);
-      haloSup.position.set(-0.4, 0.45, 0);
-      group.add(haloSup);
-
-      // Wheels
-      const wheelGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.35, 32);
-      wheelGeo.rotateX(Math.PI / 2);
-      const tireMat = new THREE.MeshStandardMaterial({ color: 0x151515, roughness: 0.9, metalness: 0.1 });
-      const rimMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.4, metalness: 0.8 });
-
-      const addWheel = (x, z) => {
-          const w = new THREE.Mesh(wheelGeo, tireMat);
-          w.position.set(x, 0.35, z);
-          const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.36, 16), rimMat);
-          rim.rotateX(Math.PI / 2);
-          w.add(rim);
-          group.add(w);
-      };
-
-      addWheel(1.0, 0.8);
-      addWheel(1.0, -0.8);
-      addWheel(-1.3, 0.8);
-      addWheel(-1.3, -0.8);
-
-      garageModel = group;
+      // 5. GLTF F1 Car Loading (Draco Compression)
+      garageModel = new THREE.Group();
       threeScene.add(garageModel);
+
+      threeRenderer.shadowMap.enabled = true;
+      threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+      mainLight.castShadow = true;
+      mainLight.shadow.mapSize.width = 1024;
+      mainLight.shadow.mapSize.height = 1024;
+
+      const loader = new THREE.GLTFLoader();
+      const dracoLoader = new THREE.DRACOLoader();
+      dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
+      loader.setDRACOLoader(dracoLoader);
+
+      loader.load(
+          '/public/models/f1_car.glb',
+          function (gltf) {
+              const car = gltf.scene;
+              car.scale.set(0.5, 0.5, 0.5);
+              car.position.set(0, 0, 0);
+
+              // Enable shadows and PBR tweaks
+              car.traverse((node) => {
+                  if (node.isMesh) {
+                      node.castShadow = true;
+                      node.receiveShadow = true;
+                      if (node.material) {
+                          node.material.envMapIntensity = 1.2;
+                          node.material.needsUpdate = true;
+                      }
+                  }
+              });
+
+              garageModel.add(car);
+          },
+          undefined,
+          function (error) {
+              console.error('Error loading F1 model:', error);
+          }
+      );
 
       // Add a premium glowing grid helper
       const grid = new THREE.GridHelper(20, 40, 0xff0000, 0x1f2330);
@@ -1890,7 +1847,8 @@
            let optionsHtml = '';
            const options = JSON.parse(data.options || '[]');
            options.forEach((opt, idx) => {
-               optionsHtml += `<button class="btn-action" style="background:var(--card-sub); border:1px solid var(--border); text-align:left; justify-content:flex-start;" onclick="submitQuizAnswer('${opt.replace(/'/g, "\\'")}')">${opt}</button>`;
+               const safeOpt = opt.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+               optionsHtml += `<button class="btn-action" style="background:var(--card-sub); border:1px solid var(--border); text-align:left; justify-content:flex-start;" onclick="submitQuizAnswer('${opt.replace(/'/g, "\\'").replace(/"/g, "&quot;")}')">${safeOpt}</button>`;
            });
            document.getElementById('quizOptionsBox').innerHTML = optionsHtml;
         } else {
@@ -2015,6 +1973,22 @@
             alert('Состав команды сохранен!');
         } catch(e) {
             alert('Ошибка при сохранении команды.');
+        }
+    }
+
+    function buyUpgrade(type, cost) {
+        if (window.userCoins !== undefined && window.userCoins >= cost) {
+            window.userCoins -= cost;
+            if (document.getElementById('garageCoinBalance')) {
+                document.getElementById('garageCoinBalance').innerText = window.userCoins;
+            }
+            syncUserStatsToD1();
+            alert('Улучшение успешно куплено!');
+            if (type === 'livery') {
+                alert('Ретро-ливрея теперь доступна в гараже!');
+            }
+        } else {
+            alert('Недостаточно монет (🪙)!');
         }
     }
 
