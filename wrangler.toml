@@ -16,7 +16,7 @@ binding = "AI"
 # 1. 0 0 * * * -> Every day at midnight for AI Quiz Generation
 # 2. 0 * * * * -> Every hour for notification checks
 [triggers]
-crons = ["0 0 * * *", "0 * * * *"]
+crons = ["0 0 * * *", "0 * * * *", "*/5 * * * *"]
 
 [[rules]]
 type = "Text"

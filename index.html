@@ -7,6 +7,7 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,7 +46,7 @@
     body {
       background-color: var(--bg);
       color: var(--text);
-      font-family: 'Orbitron', monospace;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 16px 16px 95px 16px;
       -webkit-font-smoothing: antialiased;
@@ -649,8 +650,17 @@
 
   <!-- ================= 4. ЭКРАН: ИГРЫ F1 + ПРЕДИКШН ================= -->
   <div id="view-games" class="view-screen">
-    <!-- БЛОК ПРЕДИКШНА НА ГОНКУ -->
-    <div class="game-card" style="border: 2px solid var(--accent);">
+    <!-- ТАБЫ ВНУТРИ ИГР -->
+    <div style="display:flex; gap:8px; margin-bottom:16px; overflow-x:auto;">
+      <button class="btn-action" style="flex:1; padding:8px;" onclick="switchGamesTab('predict')">Предикты</button>
+      <button class="btn-action" style="flex:1; padding:8px; background:var(--card-sub);" onclick="switchGamesTab('fantasy')">Команда</button>
+      <button class="btn-action" style="flex:1; padding:8px; background:var(--card-sub);" onclick="switchGamesTab('quiz')">Квизы</button>
+    </div>
+
+    <!-- Вкладка: Предикты -->
+    <div id="games-tab-predict">
+      <!-- БЛОК ПРЕДИКШНА НА ГОНКУ -->
+      <div class="game-card" style="border: 2px solid var(--accent);">
       <h3 style="margin:0 0 6px 0; font-size:18px; font-weight:900;">🏆 Предикшн на Гран-при</h3>
       <div style="font-size:13px; color:var(--text-muted); line-height:1.4; margin-bottom:14px;">
         Выберите победителя гонки (3 очка за 1 место, 2 за 2-е, 1 за 3-е). Прогноз можно сделать 1 раз!
@@ -700,6 +710,43 @@
       <div class="reaction-res" id="pitstopTimerDisplay" style="color:var(--text); font-size:22px;">2.00 сек</div>
       <button class="btn-action" style="margin-top:10px;" onclick="resetPitstopGame()">НАЧАТЬ ПИТ-СТОП</button>
     </div>
+    </div> <!-- end games-tab-predict -->
+
+    <!-- Вкладка: Fantasy Team -->
+    <div id="games-tab-fantasy" style="display:none;">
+      <div class="game-card">
+        <h3 style="margin:0 0 10px 0; font-size:18px; font-weight:900;">🏎️ Команда F1 (Fantasy)</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding:10px; background:var(--card-sub); border-radius:10px;">
+          <div style="font-size:12px; font-weight:700; color:var(--text-muted);">БЮДЖЕТ</div>
+          <div style="font-size:18px; font-weight:900; color:#00d95a;" id="fantasyBudgetDisplay">$100.0M</div>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <label style="font-size:11px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">ПИЛОТ 1</label>
+          <select id="fantasyDriver1" class="prediction-select" style="margin:0;" onchange="updateFantasyBudget()"></select>
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:11px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">ПИЛОТ 2</label>
+          <select id="fantasyDriver2" class="prediction-select" style="margin:0;" onchange="updateFantasyBudget()"></select>
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="font-size:11px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">ШАССИ (КОМАНДА)</label>
+          <select id="fantasyConstructor" class="prediction-select" style="margin:0;" onchange="updateFantasyBudget()"></select>
+        </div>
+
+        <button class="btn-action" onclick="saveFantasyTeam()">💾 СОХРАНИТЬ СОСТАВ</button>
+      </div>
+    </div>
+
+    <!-- Вкладка: Квизы -->
+    <div id="games-tab-quiz" style="display:none;">
+      <div class="game-card" id="quizCardBox">
+        <h3 style="margin:0 0 10px 0; font-size:18px; font-weight:900;">❓ Ежедневный F1 Квиз</h3>
+        <div style="font-size:13px; color:var(--text-muted); margin-bottom:16px;" id="quizQuestionText">Загрузка вопроса...</div>
+        <div style="display:flex; flex-direction:column; gap:8px;" id="quizOptionsBox"></div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ДЕТАЛИЗАЦИЯ КАТАЛОГА -->
@@ -1651,74 +1698,103 @@
       blueLight.position.set(3, 1, 3);
       threeScene.add(blueLight);
 
-      // 5. PBR Model (Premium stylization)
+      // 5. Procedural Detailed PBR F1 Car
       const group = new THREE.Group();
 
-      // Carbon fiber-like dark chassis
-      const bodyGeo = new THREE.BoxGeometry(2.4, 0.3, 1.1);
-      const bodyMat = new THREE.MeshStandardMaterial({
-          color: 0x111111,
-          metalness: 0.8,
-          roughness: 0.3,
-          envMapIntensity: 1.0
-      });
-      const body = new THREE.Mesh(bodyGeo, bodyMat);
-      body.position.y = 0.4;
-      group.add(body);
+      const carbonMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.8, roughness: 0.3 });
+      const redPaintMat = new THREE.MeshStandardMaterial({ color: 0xcc0000, metalness: 0.6, roughness: 0.2 });
+      const whitePaintMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.3, roughness: 0.1 });
 
-      // Aerodynamic nose
-      const noseGeo = new THREE.CylinderGeometry(0.3, 0.55, 0.8, 4);
-      noseGeo.rotateZ(Math.PI / 2);
-      noseGeo.rotateX(Math.PI / 4);
-      const nose = new THREE.Mesh(noseGeo, bodyMat);
-      nose.position.set(-1.6, 0.4, 0);
+      // Main Chassis (Aerodynamic Shape)
+      const chassisGeo = new THREE.CylinderGeometry(0.3, 0.5, 2.5, 12, 1, false, 0, Math.PI);
+      chassisGeo.rotateZ(-Math.PI / 2);
+      chassisGeo.scale(1, 0.4, 0.8);
+      const chassis = new THREE.Mesh(chassisGeo, redPaintMat);
+      chassis.position.set(0, 0.3, 0);
+      group.add(chassis);
+
+      // Sidepods
+      const sidepodGeo = new THREE.BoxGeometry(1.2, 0.25, 1.4);
+      const sidepod = new THREE.Mesh(sidepodGeo, redPaintMat);
+      sidepod.position.set(0.2, 0.3, 0);
+      group.add(sidepod);
+
+      // Engine Cover / Fin
+      const finGeo = new THREE.BoxGeometry(0.8, 0.4, 0.05);
+      const fin = new THREE.Mesh(finGeo, whitePaintMat);
+      fin.position.set(0.5, 0.6, 0);
+      group.add(fin);
+
+      // Nose Cone
+      const noseGeo = new THREE.CylinderGeometry(0.1, 0.3, 1.2, 8);
+      noseGeo.rotateZ(-Math.PI / 2);
+      noseGeo.scale(1, 0.3, 1);
+      const nose = new THREE.Mesh(noseGeo, redPaintMat);
+      nose.position.set(-1.6, 0.25, 0);
       group.add(nose);
 
-      // Bright red accent line
-      const accentGeo = new THREE.BoxGeometry(1.8, 0.05, 1.12);
-      const accentMat = new THREE.MeshStandardMaterial({ color: 0xff0000, metalness: 0.5, roughness: 0.2 });
-      const accent = new THREE.Mesh(accentGeo, accentMat);
-      accent.position.set(0, 0.45, 0);
-      group.add(accent);
+      // Front Wing
+      const fWingBaseGeo = new THREE.BoxGeometry(0.3, 0.05, 1.6);
+      const fWingBase = new THREE.Mesh(fWingBaseGeo, carbonMat);
+      fWingBase.position.set(-2.0, 0.15, 0);
+      group.add(fWingBase);
+      const fWingEndplateGeo = new THREE.BoxGeometry(0.4, 0.2, 0.05);
+      const fWingLeft = new THREE.Mesh(fWingEndplateGeo, carbonMat);
+      fWingLeft.position.set(-2.0, 0.2, 0.8);
+      group.add(fWingLeft);
+      const fWingRight = new THREE.Mesh(fWingEndplateGeo, carbonMat);
+      fWingRight.position.set(-2.0, 0.2, -0.8);
+      group.add(fWingRight);
 
-      // Cockpit halo
-      const cockpitGeo = new THREE.BoxGeometry(0.8, 0.3, 0.6);
-      const cockpitMat = new THREE.MeshStandardMaterial({ color: 0x050505, metalness: 0.9, roughness: 0.1 });
-      const cockpit = new THREE.Mesh(cockpitGeo, cockpitMat);
-      cockpit.position.set(0, 0.7, 0);
-      group.add(cockpit);
+      // Rear Wing
+      const rWingBaseGeo = new THREE.BoxGeometry(0.3, 0.05, 1.2);
+      const rWing = new THREE.Mesh(rWingBaseGeo, carbonMat);
+      rWing.position.set(1.2, 0.7, 0);
+      group.add(rWing);
+      const rWingSupGeo = new THREE.BoxGeometry(0.1, 0.5, 0.4);
+      const rWingSup = new THREE.Mesh(rWingSupGeo, carbonMat);
+      rWingSup.position.set(1.2, 0.45, 0);
+      group.add(rWingSup);
+      const rWingEndplateGeo = new THREE.BoxGeometry(0.4, 0.5, 0.05);
+      const rWingLeft = new THREE.Mesh(rWingEndplateGeo, carbonMat);
+      rWingLeft.position.set(1.2, 0.6, 0.6);
+      group.add(rWingLeft);
+      const rWingRight = new THREE.Mesh(rWingEndplateGeo, carbonMat);
+      rWingRight.position.set(1.2, 0.6, -0.6);
+      group.add(rWingRight);
 
-      // Rear wing
-      const wingGeo = new THREE.BoxGeometry(0.3, 0.05, 1.2);
-      const wing = new THREE.Mesh(wingGeo, accentMat);
-      wing.position.set(1.1, 0.8, 0);
-      group.add(wing);
+      // Halo
+      const haloGeo = new THREE.TorusGeometry(0.25, 0.03, 8, 24, Math.PI);
+      haloGeo.rotateX(Math.PI / 2);
+      haloGeo.rotateY(Math.PI / 12);
+      const halo = new THREE.Mesh(haloGeo, carbonMat);
+      halo.position.set(-0.1, 0.55, 0);
+      group.add(halo);
+      const haloSupGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.2);
+      haloSupGeo.rotateZ(Math.PI / 6);
+      const haloSup = new THREE.Mesh(haloSupGeo, carbonMat);
+      haloSup.position.set(-0.4, 0.45, 0);
+      group.add(haloSup);
 
-      const wingSupport = new THREE.BoxGeometry(0.1, 0.4, 0.6);
-      const wingSupMesh = new THREE.Mesh(wingSupport, bodyMat);
-      wingSupMesh.position.set(1.1, 0.6, 0);
-      group.add(wingSupMesh);
-
-      // Wide PBR tires
+      // Wheels
       const wheelGeo = new THREE.CylinderGeometry(0.35, 0.35, 0.35, 32);
       wheelGeo.rotateX(Math.PI / 2);
-      const wheelMat = new THREE.MeshStandardMaterial({ color: 0x151515, roughness: 0.9, metalness: 0.1 });
+      const tireMat = new THREE.MeshStandardMaterial({ color: 0x151515, roughness: 0.9, metalness: 0.1 });
       const rimMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.4, metalness: 0.8 });
 
       const addWheel = (x, z) => {
-          const w = new THREE.Mesh(wheelGeo, wheelMat);
+          const w = new THREE.Mesh(wheelGeo, tireMat);
           w.position.set(x, 0.35, z);
-          // Add rim
           const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.36, 16), rimMat);
           rim.rotateX(Math.PI / 2);
           w.add(rim);
           group.add(w);
       };
 
-      addWheel(0.9, 0.7);
-      addWheel(0.9, -0.7);
-      addWheel(-1.0, 0.7);
-      addWheel(-1.0, -0.7);
+      addWheel(1.0, 0.8);
+      addWheel(1.0, -0.8);
+      addWheel(-1.3, 0.8);
+      addWheel(-1.3, -0.8);
 
       garageModel = group;
       threeScene.add(garageModel);
@@ -1730,13 +1806,19 @@
       grid.material.transparent = true;
       threeScene.add(grid);
 
+      // OrbitControls for manual rotation
+      const controls = new THREE.OrbitControls(threeCamera, threeRenderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.enableZoom = false;
+      controls.enablePan = false;
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 2.0;
+
       // 6. Animation Loop
       function animate() {
         requestAnimationFrame(animate);
-        // Slowly rotate model
-        if (garageModel) {
-          garageModel.rotation.y += 0.005;
-        }
+        controls.update(); // Required if damping or autoRotate is enabled
         threeRenderer.render(threeScene, threeCamera);
       }
       animate();
@@ -1776,7 +1858,164 @@
 
       if (tabName === 'garage') {
         setTimeout(initGarage3D, 50);
+        loadUserStatsFromD1();
       }
+
+      if (tabName === 'games') {
+        switchGamesTab('predict');
+      }
+    }
+
+    function switchGamesTab(tab) {
+      document.getElementById('games-tab-predict').style.display = 'none';
+      document.getElementById('games-tab-fantasy').style.display = 'none';
+      document.getElementById('games-tab-quiz').style.display = 'none';
+      document.getElementById('games-tab-' + tab).style.display = 'block';
+
+      if (tab === 'fantasy') loadFantasyTeam();
+      if (tab === 'quiz') fetchQuiz();
+    }
+
+    let currentQuizData = null;
+
+    async function fetchQuiz() {
+      try {
+        const res = await fetch(`${WORKER_URL}/api/quiz`);
+        const data = await res.json();
+
+        if (data && data.question) {
+           currentQuizData = data;
+           document.getElementById('quizQuestionText').innerText = data.question;
+
+           let optionsHtml = '';
+           const options = JSON.parse(data.options || '[]');
+           options.forEach((opt, idx) => {
+               optionsHtml += `<button class="btn-action" style="background:var(--card-sub); border:1px solid var(--border); text-align:left; justify-content:flex-start;" onclick="submitQuizAnswer('${opt.replace(/'/g, "\\'")}')">${opt}</button>`;
+           });
+           document.getElementById('quizOptionsBox').innerHTML = optionsHtml;
+        } else {
+           document.getElementById('quizQuestionText').innerText = 'На сегодня квизов больше нет!';
+           document.getElementById('quizOptionsBox').innerHTML = '';
+        }
+      } catch (e) {
+        document.getElementById('quizQuestionText').innerText = 'Ошибка при загрузке квиза.';
+      }
+    }
+
+    async function submitQuizAnswer(selectedOption) {
+      if (!currentQuizData) return;
+
+      try {
+         const res = await fetch(`${WORKER_URL}/api/quiz/answer`, {
+             method: 'POST',
+             headers: { 'Content-Type': 'application/json' },
+             body: JSON.stringify({ userId: currentUserId, questionId: currentQuizData.id, answer: selectedOption })
+         });
+         const data = await res.json();
+
+         if (data.correct) {
+             alert('Правильно! +10 🪙');
+             if (window.userCoins !== undefined) {
+                 userCoins += 10;
+                 if (document.getElementById('garageCoinBalance')) {
+                     document.getElementById('garageCoinBalance').innerText = userCoins;
+                 }
+                 syncUserStatsToD1();
+             }
+             fetchQuiz(); // Load next
+         } else {
+             alert('Неправильно. Попробуй еще раз!');
+         }
+      } catch (e) {
+         alert('Ошибка сети.');
+      }
+    }
+
+    const FANTASY_DRIVERS = [
+        { id: 'VER', name: 'Max Verstappen', price: 30.0 },
+        { id: 'NOR', name: 'Lando Norris', price: 25.0 },
+        { id: 'LEC', name: 'Charles Leclerc', price: 22.0 },
+        { id: 'PIA', name: 'Oscar Piastri', price: 20.0 },
+        { id: 'SAI', name: 'Carlos Sainz', price: 18.0 }
+    ];
+
+    const FANTASY_CONSTRUCTORS = [
+        { id: 'RBR', name: 'Red Bull Racing', price: 35.0 },
+        { id: 'MCL', name: 'McLaren', price: 30.0 },
+        { id: 'FER', name: 'Ferrari', price: 28.0 },
+        { id: 'MER', name: 'Mercedes', price: 25.0 }
+    ];
+
+    async function loadFantasyTeam() {
+        const d1 = document.getElementById('fantasyDriver1');
+        const d2 = document.getElementById('fantasyDriver2');
+        const c1 = document.getElementById('fantasyConstructor');
+
+        if (d1.options.length === 0) {
+            d1.innerHTML = '<option value="">Выбрать пилота...</option>' + FANTASY_DRIVERS.map(d => `<option value="${d.id}">${d.name} ($${d.price}M)</option>`).join('');
+            d2.innerHTML = '<option value="">Выбрать пилота...</option>' + FANTASY_DRIVERS.map(d => `<option value="${d.id}">${d.name} ($${d.price}M)</option>`).join('');
+            c1.innerHTML = '<option value="">Выбрать шасси...</option>' + FANTASY_CONSTRUCTORS.map(c => `<option value="${c.id}">${c.name} ($${c.price}M)</option>`).join('');
+        }
+
+        try {
+            const res = await fetch(`${WORKER_URL}/api/fantasy/team?userId=${currentUserId}`);
+            const data = await res.json();
+            if (data && data.driver1) d1.value = data.driver1;
+            if (data && data.driver2) d2.value = data.driver2;
+            if (data && data.constructor) c1.value = data.constructor;
+            updateFantasyBudget();
+        } catch(e) {}
+    }
+
+    function updateFantasyBudget() {
+        let budget = 100.0;
+        const d1 = document.getElementById('fantasyDriver1').value;
+        const d2 = document.getElementById('fantasyDriver2').value;
+        const c1 = document.getElementById('fantasyConstructor').value;
+
+        const dr1 = FANTASY_DRIVERS.find(d => d.id === d1);
+        const dr2 = FANTASY_DRIVERS.find(d => d.id === d2);
+        const cr1 = FANTASY_CONSTRUCTORS.find(c => c.id === c1);
+
+        if (dr1) budget -= dr1.price;
+        if (dr2) budget -= dr2.price;
+        if (cr1) budget -= cr1.price;
+
+        const display = document.getElementById('fantasyBudgetDisplay');
+        display.innerText = `$${budget.toFixed(1)}M`;
+        if (budget < 0) {
+            display.style.color = 'var(--accent)';
+        } else {
+            display.style.color = '#00d95a';
+        }
+    }
+
+    async function saveFantasyTeam() {
+        const d1 = document.getElementById('fantasyDriver1').value;
+        const d2 = document.getElementById('fantasyDriver2').value;
+        const c1 = document.getElementById('fantasyConstructor').value;
+        const budgetText = document.getElementById('fantasyBudgetDisplay').innerText;
+
+        if (budgetText.startsWith('$-')) {
+            alert('Превышен лимит бюджета ($100M)!');
+            return;
+        }
+
+        try {
+            await fetch(`${WORKER_URL}/api/fantasy/team`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: currentUserId,
+                    driver1: d1,
+                    driver2: d2,
+                    constructor: c1
+                })
+            });
+            alert('Состав команды сохранен!');
+        } catch(e) {
+            alert('Ошибка при сохранении команды.');
+        }
     }
 
     function openViewScreen(screenName) {
@@ -2347,16 +2586,43 @@
       { id: 'fanatic', title: 'Фанатичная преданность', desc: 'Стрик 7 дней', icon: '🔥', reward: 300 }
     ];
 
-    let userUnlockedAchievements = []; // Will be loaded from D1/localStorage
+    let userUnlockedAchievements = [];
     let userCoins = 0;
+
+    async function loadUserStatsFromD1() {
+        try {
+            const res = await fetch(`${WORKER_URL}/api/user/stats?userId=${currentUserId}`);
+            const data = await res.json();
+            if (data && data.coins !== undefined) {
+                userCoins = data.coins || 0;
+                userUnlockedAchievements = data.achievements ? JSON.parse(data.achievements) : [];
+                if(document.getElementById('garageCoinBalance')) {
+                    document.getElementById('garageCoinBalance').innerText = userCoins;
+                    renderTrophyRoom();
+                    updateCareerRank();
+                }
+            }
+        } catch(e) {}
+    }
+
+    async function syncUserStatsToD1() {
+        try {
+            await fetch(`${WORKER_URL}/api/user/stats`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: currentUserId, coins: userCoins, achievements: JSON.stringify(userUnlockedAchievements) })
+            });
+        } catch(e) {}
+    }
 
     function renderTrophyRoom() {
       const grid = document.getElementById('achievementsGrid');
       if (!grid) return;
       grid.innerHTML = ACHIEVEMENTS_DB.map(a => {
         const isUnlocked = userUnlockedAchievements.includes(a.id);
+        const onClickAction = isUnlocked ? "" : `onclick="showAchievementTooltip('${a.desc}')"`;
         return `
-          <div style="text-align:center; opacity: ${isUnlocked ? '1' : '0.4'}; filter: ${isUnlocked ? 'none' : 'grayscale(1)'};">
+          <div class="achievement" ${onClickAction} style="text-align:center; opacity: ${isUnlocked ? '1' : '0.4'}; filter: ${isUnlocked ? 'none' : 'grayscale(1)'}; cursor: ${isUnlocked ? 'default' : 'pointer'}; position:relative;">
             <div style="width:100%; aspect-ratio:1; border-radius:16px; background:var(--card-sub); border:2px solid ${isUnlocked ? 'var(--accent)' : 'var(--border)'}; display:flex; align-items:center; justify-content:center; font-size:28px; margin-bottom:6px; box-shadow: ${isUnlocked ? '0 4px 12px rgba(255,0,0,0.15)' : 'none'};">
               ${a.icon}
             </div>
@@ -2364,6 +2630,15 @@
           </div>
         `;
       }).join('');
+    }
+
+    function showAchievementTooltip(desc) {
+      const toast = document.getElementById('achievementToast');
+      document.getElementById('toastIcon').innerText = '🔒';
+      document.getElementById('toastTitle').innerText = 'Заблокировано';
+      document.getElementById('toastReward').innerText = desc;
+      toast.style.top = '20px';
+      setTimeout(() => { toast.style.top = '-100px'; }, 3000);
     }
 
     function showAchievementToast(achievementId) {
@@ -2379,6 +2654,8 @@
           renderTrophyRoom();
           updateCareerRank();
       }
+
+      syncUserStatsToD1();
 
       const toast = document.getElementById('achievementToast');
       document.getElementById('toastIcon').innerText = a.icon;

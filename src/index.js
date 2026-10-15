@@ -94,6 +94,134 @@ export default {
         return new Response(JSON.stringify({ success: true }), { headers: corsHeaders });
       }
 
+
+      // API: Fantasy Team
+      if (url.pathname === '/api/fantasy/team' && request.method === 'GET') {
+          const userId = url.searchParams.get('userId');
+          if (!userId) return new Response(JSON.stringify({error: 'userId required'}), {status: 400, headers: corsHeaders});
+
+          try {
+              let team = await env.DB.prepare('SELECT * FROM user_team WHERE user_id = ?').bind(userId).first();
+              return new Response(JSON.stringify(team || {}), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+          } catch(e) {
+              return new Response(JSON.stringify({}), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+          }
+      }
+
+      if (url.pathname === '/api/fantasy/team' && request.method === 'POST') {
+          const body = await request.json();
+          const { userId, driver1, driver2, constructor } = body;
+          if (!userId) return new Response(JSON.stringify({error: 'userId required'}), {status: 400, headers: corsHeaders});
+
+          try {
+              // Basic init if table missing
+              await env.DB.prepare(`CREATE TABLE IF NOT EXISTS user_team (user_id TEXT PRIMARY KEY, driver1 TEXT, driver2 TEXT, constructor TEXT, updated_at DATETIME)`).run();
+
+              await env.DB.prepare(`
+                  INSERT INTO user_team (user_id, driver1, driver2, constructor, updated_at)
+                  VALUES (?, ?, ?, ?, datetime('now'))
+                  ON CONFLICT(user_id) DO UPDATE SET driver1=excluded.driver1, driver2=excluded.driver2, constructor=excluded.constructor, updated_at=datetime('now')
+              `).bind(userId, driver1 || '', driver2 || '', constructor || '').run();
+
+              return new Response(JSON.stringify({success: true}), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+          } catch(e) {
+              return new Response(JSON.stringify({success: false, error: e.message}), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+          }
+      }
+
+      // API: Quizzes
+      if (url.pathname === '/api/quiz' && request.method === 'GET') {
+          try {
+              // Ensure table exists
+              await env.DB.prepare(`CREATE TABLE IF NOT EXISTS quiz_questions (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT, options TEXT, correct_answer TEXT, created_at DATETIME)`).run();
+              // Get a random question
+              const question = await env.DB.prepare('SELECT id, question, options FROM quiz_questions ORDER BY RANDOM() LIMIT 1').first();
+              return new Response(JSON.stringify(question || {}), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+          } catch(e) {
+              return new Response(JSON.stringify({}), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+          }
+      }
+
+      if (url.pathname === '/api/quiz/answer' && request.method === 'POST') {
+          const body = await request.json();
+          const { userId, questionId, answer } = body;
+
+          try {
+              const question = await env.DB.prepare('SELECT correct_answer FROM quiz_questions WHERE id = ?').bind(questionId).first();
+              if (question && question.correct_answer === answer) {
+                  return new Response(JSON.stringify({correct: true}), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+              } else {
+                  return new Response(JSON.stringify({correct: false}), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+              }
+          } catch(e) {
+              return new Response(JSON.stringify({error: e.message}), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+          }
+      }
+
+      // API: User Stats (Coins & Achievements)
+      if (url.pathname === '/api/user/stats' && request.method === 'GET') {
+          const userId = url.searchParams.get('userId');
+          if (!userId) return new Response(JSON.stringify({error: 'userId required'}), {status: 400, headers: corsHeaders});
+
+          try {
+              let stats = await env.DB.prepare('SELECT * FROM user_stats WHERE user_id = ?').bind(userId).first();
+              return new Response(JSON.stringify(stats || { coins: 0, achievements: '[]' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+          } catch(e) {
+              return new Response(JSON.stringify({ coins: 0, achievements: '[]' }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+          }
+      }
+
+      if (url.pathname === '/api/user/stats' && request.method === 'POST') {
+          const body = await request.json();
+          const { userId, coins, achievements } = body;
+          if (!userId) return new Response(JSON.stringify({error: 'userId required'}), {status: 400, headers: corsHeaders});
+
+          try {
+              await env.DB.prepare(`CREATE TABLE IF NOT EXISTS user_stats (user_id TEXT PRIMARY KEY, coins INTEGER, achievements TEXT)`).run();
+              await env.DB.prepare(`
+                  INSERT INTO user_stats (user_id, coins, achievements)
+                  VALUES (?, ?, ?)
+                  ON CONFLICT(user_id) DO UPDATE SET coins=excluded.coins, achievements=excluded.achievements
+              `).bind(userId, coins || 0, achievements || '[]').run();
+
+              return new Response(JSON.stringify({success: true}), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+          } catch(e) {
+              return new Response(JSON.stringify({success: false, error: e.message}), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+          }
+      }
+
+      // API: Circuits SVG mock
+      if (url.pathname.startsWith('/api/circuits/') && request.method === 'GET') {
+          const circuitKey = url.pathname.split('/').pop().toLowerCase();
+
+          let path = "";
+          let name = "";
+          if (circuitKey.includes('monaco')) {
+              path = "M100 100 Q 150 50, 200 100 T 300 200 T 150 250 Z";
+              name = "Монако";
+          } else if (circuitKey.includes('silverstone')) {
+              path = "M150 50 L 300 100 Q 350 150, 250 250 L 100 200 Z";
+              name = "Сильверстоун";
+          } else if (circuitKey.includes('monza')) {
+              path = "M50 150 L 350 150 Q 400 200, 350 250 L 50 250 Z";
+              name = "Монца";
+          } else {
+              // Default fallback
+              path = "M100 150 Q 200 50, 300 150 T 100 150 Z";
+              name = "Трасса";
+          }
+
+          return new Response(JSON.stringify({
+              success: true,
+              path: path,
+              name: name,
+              length: 5.8,
+              laps: 50,
+              firstYear: 1950,
+              distance: 300
+          }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+
       // API: Season stats mock
       if (url.pathname === '/api/season/live' && request.method === 'GET') {
           // Returning empty allows the frontend to fallback to default data,
