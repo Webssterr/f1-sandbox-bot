@@ -115,7 +115,7 @@ export default {
 
           try {
               // Basic init if table missing
-              await env.DB.prepare(`CREATE TABLE IF NOT EXISTS user_team (user_id TEXT PRIMARY KEY, driver1 TEXT, driver2 TEXT, constructor TEXT, updated_at DATETIME)`).run();
+
 
               await env.DB.prepare(`
                   INSERT INTO user_team (user_id, driver1, driver2, constructor, updated_at)
@@ -133,7 +133,7 @@ export default {
       if (url.pathname === '/api/quiz' && request.method === 'GET') {
           try {
               // Ensure table exists
-              await env.DB.prepare(`CREATE TABLE IF NOT EXISTS quiz_questions (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT, options TEXT, correct_answer TEXT, created_at DATETIME)`).run();
+
               // Get a random question
               const question = await env.DB.prepare('SELECT id, question, options FROM quiz_questions ORDER BY RANDOM() LIMIT 1').first();
               return new Response(JSON.stringify(question || {}), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
@@ -177,7 +177,7 @@ export default {
           if (!userId) return new Response(JSON.stringify({error: 'userId required'}), {status: 400, headers: corsHeaders});
 
           try {
-              await env.DB.prepare(`CREATE TABLE IF NOT EXISTS user_stats (user_id TEXT PRIMARY KEY, coins INTEGER, achievements TEXT)`).run();
+
               await env.DB.prepare(`
                   INSERT INTO user_stats (user_id, coins, achievements)
                   VALUES (?, ?, ?)
@@ -190,36 +190,41 @@ export default {
           }
       }
 
-      // API: Circuits SVG mock
+      // API: Circuits D1
       if (url.pathname.startsWith('/api/circuits/') && request.method === 'GET') {
           const circuitKey = url.pathname.split('/').pop().toLowerCase();
+          try {
+             // Init table if it does not exist and populate with defaults
+             await env.DB.prepare(`CREATE TABLE IF NOT EXISTS circuits (key TEXT PRIMARY KEY, name TEXT, path TEXT, length REAL, laps INTEGER, firstYear INTEGER, distance REAL)`).run();
 
-          let path = "";
-          let name = "";
-          if (circuitKey.includes('monaco')) {
-              path = "M100 100 Q 150 50, 200 100 T 300 200 T 150 250 Z";
-              name = "Монако";
-          } else if (circuitKey.includes('silverstone')) {
-              path = "M150 50 L 300 100 Q 350 150, 250 250 L 100 200 Z";
-              name = "Сильверстоун";
-          } else if (circuitKey.includes('monza')) {
-              path = "M50 150 L 350 150 Q 400 200, 350 250 L 50 250 Z";
-              name = "Монца";
-          } else {
-              // Default fallback
-              path = "M100 150 Q 200 50, 300 150 T 100 150 Z";
-              name = "Трасса";
+             // Check if empty, populate
+             const count = await env.DB.prepare('SELECT COUNT(*) as c FROM circuits').first();
+             if (count && count.c === 0) {
+                 const stmts = [
+                     env.DB.prepare("INSERT INTO circuits (key, name, path, length, laps, firstYear, distance) VALUES ('monaco', 'Монако', 'M100 100 Q 150 50, 200 100 T 300 200 T 150 250 Z', 3.337, 78, 1950, 260.286)"),
+                     env.DB.prepare("INSERT INTO circuits (key, name, path, length, laps, firstYear, distance) VALUES ('silverstone', 'Сильверстоун', 'M150 50 L 300 100 Q 350 150, 250 250 L 100 200 Z', 5.891, 52, 1950, 306.198)"),
+                     env.DB.prepare("INSERT INTO circuits (key, name, path, length, laps, firstYear, distance) VALUES ('monza', 'Монца', 'M50 150 L 350 150 Q 400 200, 350 250 L 50 250 Z', 5.793, 53, 1950, 306.720)")
+                 ];
+                 await env.DB.batch(stmts);
+             }
+
+             const circuit = await env.DB.prepare('SELECT * FROM circuits WHERE key LIKE ?').bind('%' + circuitKey + '%').first();
+             if (circuit) {
+                 return new Response(JSON.stringify({
+                     success: true,
+                     path: circuit.path,
+                     name: circuit.name,
+                     length: circuit.length,
+                     laps: circuit.laps,
+                     firstYear: circuit.firstYear,
+                     distance: circuit.distance
+                 }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+             } else {
+                 return new Response(JSON.stringify({ error: 'Circuit not found' }), { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+             }
+          } catch(e) {
+              return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
           }
-
-          return new Response(JSON.stringify({
-              success: true,
-              path: path,
-              name: name,
-              length: 5.8,
-              laps: 50,
-              firstYear: 1950,
-              distance: 300
-          }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
 
       // API: Season stats mock
