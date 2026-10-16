@@ -206,7 +206,10 @@ export default {
       if (url.pathname.startsWith('/api/circuits/') && request.method === 'GET') {
           const circuitKey = url.pathname.split('/').pop().toLowerCase();
           try {
+             // Init table if it does not exist and populate with defaults
              await env.DB.prepare(`CREATE TABLE IF NOT EXISTS circuits (key TEXT PRIMARY KEY, name TEXT, path TEXT, length REAL, laps INTEGER, firstYear INTEGER, distance REAL)`).run();
+
+             // Check if empty, populate
              const count = await env.DB.prepare('SELECT COUNT(*) as c FROM circuits').first();
              if (count && count.c === 0) {
                  const stmts = [

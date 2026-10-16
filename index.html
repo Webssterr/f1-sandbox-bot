@@ -1847,7 +1847,8 @@
            let optionsHtml = '';
            const options = JSON.parse(data.options || '[]');
            options.forEach((opt, idx) => {
-               optionsHtml += `<button class="btn-action" style="background:var(--card-sub); border:1px solid var(--border); text-align:left; justify-content:flex-start;" onclick="submitQuizAnswer('${opt.replace(/'/g, "\\'")}')">${opt}</button>`;
+               const safeOpt = opt.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+               optionsHtml += `<button class="btn-action" style="background:var(--card-sub); border:1px solid var(--border); text-align:left; justify-content:flex-start;" onclick="submitQuizAnswer('${opt.replace(/'/g, "\\'").replace(/"/g, "&quot;")}')">${safeOpt}</button>`;
            });
            document.getElementById('quizOptionsBox').innerHTML = optionsHtml;
         } else {
