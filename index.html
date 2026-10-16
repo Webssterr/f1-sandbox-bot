@@ -2684,6 +2684,10 @@
 
     async function initAppRouting() {
       try {
+        await fetch(`${WORKER_URL}/api/init`);
+      } catch(e) {}
+
+      try {
         initThemeAndPreferences();
         loadCatalogDatabase();
 

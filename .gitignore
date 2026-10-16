@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+node_modules
+.wrangler
+=======
 .wrangler/
 dist/
 node_modules
+>>>>>>> a6c0914 (feat: implement F1 app final overhaul with fantasy team, 3d car, quiz cron and d1 stats)

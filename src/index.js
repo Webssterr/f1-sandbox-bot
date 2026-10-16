@@ -24,6 +24,18 @@ export default {
 
     // Handle APIs
     try {
+      // API: Init DB
+      if (url.pathname === '/api/init' && request.method === 'GET') {
+          try {
+              await env.DB.prepare(`CREATE TABLE IF NOT EXISTS user_team (user_id TEXT PRIMARY KEY, driver1 TEXT, driver2 TEXT, constructor TEXT, updated_at DATETIME)`).run();
+              await env.DB.prepare(`CREATE TABLE IF NOT EXISTS quiz_questions (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT, options TEXT, correct_answer TEXT, created_at DATETIME)`).run();
+              await env.DB.prepare(`CREATE TABLE IF NOT EXISTS user_stats (user_id TEXT PRIMARY KEY, coins INTEGER, achievements TEXT)`).run();
+              return new Response(JSON.stringify({success: true}), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+          } catch(e) {
+              return new Response(JSON.stringify({error: e.message}), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+          }
+      }
+
       // API: Catalog
       if (url.pathname === '/api/catalog' && request.method === 'GET') {
         let results = [];
