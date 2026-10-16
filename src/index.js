@@ -24,6 +24,18 @@ export default {
 
     // Handle APIs
     try {
+      // API: Init DB
+      if (url.pathname === '/api/init' && request.method === 'GET') {
+          try {
+              await env.DB.prepare(`CREATE TABLE IF NOT EXISTS user_team (user_id TEXT PRIMARY KEY, driver1 TEXT, driver2 TEXT, constructor TEXT, updated_at DATETIME)`).run();
+              await env.DB.prepare(`CREATE TABLE IF NOT EXISTS quiz_questions (id INTEGER PRIMARY KEY AUTOINCREMENT, question TEXT, options TEXT, correct_answer TEXT, created_at DATETIME)`).run();
+              await env.DB.prepare(`CREATE TABLE IF NOT EXISTS user_stats (user_id TEXT PRIMARY KEY, coins INTEGER, achievements TEXT)`).run();
+              return new Response(JSON.stringify({success: true}), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+          } catch(e) {
+              return new Response(JSON.stringify({error: e.message}), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+          }
+      }
+
       // API: Catalog
       if (url.pathname === '/api/catalog' && request.method === 'GET') {
         let results = [];
@@ -194,10 +206,7 @@ export default {
       if (url.pathname.startsWith('/api/circuits/') && request.method === 'GET') {
           const circuitKey = url.pathname.split('/').pop().toLowerCase();
           try {
-             // Init table if it does not exist and populate with defaults
              await env.DB.prepare(`CREATE TABLE IF NOT EXISTS circuits (key TEXT PRIMARY KEY, name TEXT, path TEXT, length REAL, laps INTEGER, firstYear INTEGER, distance REAL)`).run();
-
-             // Check if empty, populate
              const count = await env.DB.prepare('SELECT COUNT(*) as c FROM circuits').first();
              if (count && count.c === 0) {
                  const stmts = [
