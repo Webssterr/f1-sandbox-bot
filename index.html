@@ -682,6 +682,15 @@
   <div id="view-admin" class="view-screen">
     <button class="icon-circle-btn" style="width:auto; padding:0 14px; border-radius:12px; margin-bottom:14px; font-size:13px; font-weight:800;" onclick="navigateBackFromAdmin()">← Выйти из админки</button>
 
+    <!-- ИИ-АГЕНТ РАЗРАБОТЧИК (GEMINI) -->
+    <div class="hero-card" style="border-color: rgba(66, 133, 244, 0.4);">
+      <h3 style="margin:0 0 6px 0; font-size:17px; font-weight:900;">🤖 ИИ-Агент Разработчик (Gemini)</h3>
+      <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Напиши задачу текстом, и ИИ поможет написать или исправить код:</div>
+      <textarea class="search-input" id="aiAgentPromptInput" rows="3" placeholder="Например: Добавь полезную функцию или поправь стиль..."></textarea>
+      <button class="btn-action" style="background: #4285F4; margin-top:8px;" onclick="sendPromptToAiAgent()">🚀 Отправить задачу агенту</button>
+      <div id="aiAgentResponseBox" style="display:none; margin-top:14px; padding:12px; background:var(--card-sub); border-radius:12px; font-size:13px; white-space:pre-wrap; line-height:1.4; border:1px solid var(--border);"></div>
+    </div>
+
     <div class="hero-card" style="border-color: rgba(255,59,48,0.4);">
       <h3 style="margin:0 0 6px 0; font-size:17px; font-weight:900;">🏎 Управление этапом на Главной</h3>
       <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Выбери трассу и настройки:</div>
@@ -887,7 +896,7 @@
       tg.expand();
     }
 
-    const WORKER_URL = "https://dark-art-1fac.poiuyuiop132.workers.dev";
+    const WORKER_URL = "https://flat-cell-8a39.ivan-petrovich378.workers.dev";
     const BOT_USERNAME = "race_weekend_f1_bot";
     const ADMIN_ID = "301211351";
     const TESTER_ID = "8061233590";
@@ -913,6 +922,37 @@
     const currentUserId = resolveTelegramUser();
     const isAdmin = (currentUserId === ADMIN_ID);
     const isTester = (isAdmin || currentUserId === TESTER_ID);
+
+    async function sendPromptToAiAgent() {
+      const promptInput = document.getElementById('aiAgentPromptInput');
+      const responseBox = document.getElementById('aiAgentResponseBox');
+      const prompt = promptInput.value.trim();
+
+      if (!prompt) {
+        alert('Введите текст задачи для ИИ-агента!');
+        return;
+      }
+
+      responseBox.style.display = 'block';
+      responseBox.innerText = '⏳ Gemini думает и пишет код...';
+
+      try {
+        const res = await fetch(`${WORKER_URL}/api/ai/agent`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
+          body: JSON.stringify({ prompt, context: "Telegram Mini App F1 Archive, HTML/JS frontend" })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          responseBox.innerText = data.response;
+        } else {
+          responseBox.innerText = `❌ Ошибка: ${data.error || 'Неизвестная ошибка'}`;
+        }
+      } catch (e) {
+        responseBox.innerText = `❌ Ошибка сети: ${e.message}`;
+      }
+    }
 
     const CIRCUITS_SVG_DATABASE = {
       "sepang": "M 80,155 L 390,155 Q 410,155 405,140 Q 400,125 380,135 L 260,175 Q 240,180 250,200 L 275,225 Q 295,245 320,225 L 350,195 Q 370,175 400,195 L 435,215 Q 460,225 450,180 L 415,100 Q 395,50 340,55 L 260,65 Q 235,70 240,95 L 250,125 Q 245,145 220,135 L 140,135 Q 75,135 60,170 Q 55,200 95,200 L 370,200 Q 400,200 400,175 Q 400,155 380,155 Z"
@@ -945,21 +985,11 @@
       groupEl.removeAttribute('transform');
 
       let bbox = { x: 0, y: 0, width: 400, height: 200 };
-      try { 
-        bbox = pathEl.getBBox(); 
-      } catch (e) {
-        bbox = { x: -400, y: -400, width: 800, height: 800 };
-      }
+      try { bbox = pathEl.getBBox(); } catch (e) { bbox = { x: -400, y: -400, width: 800, height: 800 }; }
+      if (!bbox || !bbox.width || !bbox.height) bbox = { x: -400, y: -400, width: 800, height: 800 };
 
-      if (!bbox || !bbox.width || !bbox.height) {
-        bbox = { x: -400, y: -400, width: 800, height: 800 };
-      }
-
-      const targetW = 400;
-      const targetH = 170;
-      
-      const scaleX = targetW / bbox.width;
-      const scaleY = targetH / bbox.height;
+      const scaleX = 400 / bbox.width;
+      const scaleY = 170 / bbox.height;
       const scale = Math.min(scaleX, scaleY);
 
       const cx = bbox.x + bbox.width / 2;
@@ -980,13 +1010,7 @@
 
       trackAnimInterval = setInterval(() => {
         if (document.body.classList.contains('lite-mode')) return;
-        
-        if (isReversed) {
-          currentDistance = (currentDistance - 2.5 + pathLength) % pathLength;
-        } else {
-          currentDistance = (currentDistance + 2.5) % pathLength;
-        }
-
+        currentDistance = isReversed ? (currentDistance - 2.5 + pathLength) % pathLength : (currentDistance + 2.5) % pathLength;
         try {
           const coords = pathEl.getPointAtLength(currentDistance);
           carDot.setAttribute('cx', coords.x);
@@ -1008,7 +1032,6 @@
           document.getElementById('specHeaderTitle').innerText = `Данные трассы • ${data.name}`;
           document.getElementById('specCircuitName').innerText = data.name;
         }
-        
         if (data.length) document.getElementById('specLength').innerText = `${data.length} км`;
         if (data.laps) document.getElementById('specLaps').innerText = data.laps;
         if (data.firstYear) document.getElementById('specFirstYear').innerText = data.firstYear;
@@ -1056,14 +1079,9 @@
       const timer = { d: document.getElementById("t-d"), h: document.getElementById("t-h"), m: document.getElementById("t-m"), s: document.getElementById("t-s") };
 
       const sessionGenitiveNames = {
-        "Практика 1": "первой практики",
-        "Практика 2": "второй практики",
-        "Практика 3": "третьей практики",
-        "Спринт": "спринта",
-        "Квалификация к спринту": "спринт-квалы",
-        "Квалификация к гонке": "квалификации",
-        "Квалификация": "квалификации",
-        "Гонка": "гонки"
+        "Практика 1": "первой практики", "Практика 2": "второй практики", "Практика 3": "третьей практики",
+        "Спринт": "спринта", "Квалификация к спринту": "спринт-квалы", "Квалификация к гонке": "квалификации",
+        "Квалификация": "квалификации", "Гонка": "гонки"
       };
 
       if (sessions.length === 0) {
@@ -1076,10 +1094,7 @@
         return;
       }
 
-      function formatTime(d) { 
-        return d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit", hour12: false }); 
-      }
-
+      function formatTime(d) { return d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit", hour12: false }); }
       function formatDate(d) { return d.toLocaleDateString("ru-RU", { day: "2-digit", month: "short" }).replace(".", "").toUpperCase(); }
 
       function renderSessions(now) {
@@ -1089,39 +1104,25 @@
           const start = s.date.getTime();
           const end = start + (s.duration * 60000); 
           const cur = now.getTime();
-          
-          let status = "";
-          let cls = "sess-chip";
-
-          if (cur >= end) {
-            status = "✓ Завершено";
-            cls += " past";
-          } else if (cur >= start) {
-            status = "● Идёт";
-            cls += " active";
-          } else {
-            status = formatTime(s.date);
-          }
-
+          let status = "", cls = "sess-chip";
+          if (cur >= end) { status = "✓ Завершено"; cls += " past"; }
+          else if (cur >= start) { status = "● Идёт"; cls += " active"; }
+          else { status = formatTime(s.date); }
           return `<div class="${cls}"><div class="sess-name">${formatDate(s.date)} • ${s.short}</div><div class="sess-time">${status}</div></div>`;
         }).join("");
       }
 
       function updateTimer() {
-        const now = new Date();
-        const nowTs = now.getTime();
+        const now = new Date(), nowTs = now.getTime();
         renderSessions(now);
-
         const next = sessions.find(s => s.date.getTime() > nowTs);
         if (!next) {
           if (label) label.innerText = "🏁 Уикенд завершён";
           Object.values(timer).forEach(el => { if (el) el.innerText = "00"; });
           return;
         }
-
         const genitiveName = sessionGenitiveNames[next.name] || next.name.toLowerCase();
         if (label) label.innerText = "До " + genitiveName.charAt(0).toUpperCase() + genitiveName.slice(1);
-
         const diff = Math.max(0, next.date.getTime() - nowTs);
         if (timer.d) timer.d.innerText = String(Math.floor(diff / 86400000)).padStart(2, "0");
         if (timer.h) timer.h.innerText = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, "0");
@@ -1134,9 +1135,7 @@
       globalSessionInterval = setInterval(updateTimer, 1000);
     }
     
-    let pitstopActive = false;
-    let pitstopStartTime = 0;
-    let wheelsDone = 0;
+    let pitstopActive = false, pitstopStartTime = 0, wheelsDone = 0;
 
     function resetPitstopGame() {
       pitstopActive = true;
@@ -1158,7 +1157,6 @@
         w.innerText = '✅';
         wheelsDone++;
         if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-
         if (wheelsDone === 4) {
           pitstopActive = false;
           const totalSec = ((performance.now() - pitstopStartTime) / 1000).toFixed(2);
@@ -1175,10 +1173,8 @@
       const activeBox = document.getElementById('predictionActiveBox');
       const resBox = document.getElementById('predictionResultBox');
       if (!selectEl) return;
-
       const currentRound = window.activeRaceRound || "17"; 
       const savedPrediction = localStorage.getItem(`f1_prediction_${currentUserId}_${currentRound}`);
-      
       if (savedPrediction) {
         activeBox.style.display = 'none';
         resBox.style.display = 'block';
@@ -1195,30 +1191,16 @@
     async function submitUserPrediction() {
       const selectEl = document.getElementById('predictionDriverSelect');
       const chosen = selectEl.value;
-      
-      if (!chosen) {
-        alert('Пожалуйста, выберите гонщика!');
-        return;
-      }
-
+      if (!chosen) { alert('Пожалуйста, выберите гонщика!'); return; }
       const currentRound = window.activeRaceRound || "17"; 
       const tgUser = tg?.initDataUnsafe?.user || {};
-
       try {
         const res = await fetch(`${WORKER_URL}/api/prediction/submit`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            user_id: currentUserId,
-            round: currentRound,
-            driver_name: chosen,
-            first_name: tgUser.first_name || "Аноним",
-            last_name: tgUser.last_name || "",
-            username: tgUser.username || ""
-          })
+          body: JSON.stringify({ user_id: currentUserId, round: currentRound, driver_name: chosen, first_name: tgUser.first_name || "Аноним", last_name: tgUser.last_name || "", username: tgUser.username || "" })
         });
         const data = await res.json();
-
         if (data.success) {
           localStorage.setItem(`f1_prediction_${currentUserId}_${currentRound}`, chosen);
           document.getElementById('predictionActiveBox').style.display = 'none';
@@ -1227,12 +1209,8 @@
           resBox.innerText = `✅ Прогноз успешно принят сервером: ${chosen}`;
           if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
           loadPredictionLeaderboard();
-        } else {
-          alert("Ошибка соединения. Попробуйте еще раз!");
-        }
-      } catch (e) {
-        alert("Ошибка сети при отправке на сервер.");
-      }
+        } else { alert("Ошибка соединения."); }
+      } catch (e) { alert("Ошибка сети."); }
     }
 
     async function loadPredictionLeaderboard() {
@@ -1240,32 +1218,18 @@
         const res = await fetch(`${WORKER_URL}/api/prediction/leaderboard`);
         const data = await res.json();
         const listEl = document.getElementById('predictionLeaderboardList');
-        
         if (!data.leaderboard || data.leaderboard.length === 0) {
           listEl.innerHTML = 'Пока нет начисленных очков за гонки.';
           return;
         }
-
         listEl.innerHTML = data.leaderboard.map((row, idx) => {
-          let displayName = `${row.first_name || ''} ${row.last_name || ''}`.trim();
-          if (!displayName) {
-            displayName = row.username ? `@${row.username}` : `Игрок ...${String(row.user_id).slice(-4)}`;
-          }
-
-          return `
-            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border);">
-              <span>#${idx + 1} ${displayName}</span>
-              <span style="font-weight:900; color:var(--accent);">${row.total_points} очков</span>
-            </div>
-          `;
+          let displayName = `${row.first_name || ''} ${row.last_name || ''}`.trim() || (row.username ? `@${row.username}` : `Игрок ...${String(row.user_id).slice(-4)}`);
+          return `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border);"><span>#${idx + 1} ${displayName}</span><span style="font-weight:900; color:var(--accent);">${row.total_points} очков</span></div>`;
         }).join('');
       } catch (e) {}
     }
 
-    let allCatalogItems = [];
-    let catalogTree = {};
-    let activeCatalogCategory = null;
-
+    let allCatalogItems = [], catalogTree = {}, activeCatalogCategory = null;
     const DEFAULT_DRIVERS_DATA = [
       { pos: "01", name: "Kimi Antonelli", team: "Mercedes-AMG Petronas F1 Team", points: "302", wins: 8 },
       { pos: "02", name: "George Russell", team: "Mercedes-AMG Petronas F1 Team", points: "236", wins: 4 },
@@ -1320,14 +1284,12 @@
     function initThemeAndPreferences() {
       const savedTheme = localStorage.getItem('f1_theme_mode') || 'light';
       if (savedTheme === 'dark') document.body.classList.add('dark-theme');
-
       const isLite = localStorage.getItem('f1_lite_mode') === 'true';
       if (isLite) {
         document.body.classList.add('lite-mode');
         const liteCheck = document.getElementById('userSettingLiteToggle');
         if (liteCheck) liteCheck.checked = true;
       }
-
       document.getElementById('userSettingVideoNotify').checked = localStorage.getItem('f1_set_video') !== 'false';
       document.getElementById('userSettingTextNotify').checked = localStorage.getItem('f1_set_text') !== 'false';
       document.getElementById('userSettingNewsNotify').checked = localStorage.getItem('f1_set_news') !== 'false';
@@ -1337,11 +1299,6 @@
         const adminBtn = document.getElementById('adminDirectEntryBlock');
         if (adminBtn) adminBtn.style.display = 'block';
       }
-      if (isTester) {
-        const betaRow = document.getElementById('betaTesterSettingRow');
-        if (betaRow) betaRow.style.display = 'flex';
-      }
-
       applySavedWeekendConfig();
     }
 
@@ -1363,18 +1320,13 @@
       localStorage.setItem('f1_lite_mode', enabled ? 'true' : 'false');
     }
 
-    function openSettingsModal() {
-      document.getElementById('appSettingsModal').classList.add('active');
-    }
-
+    function openSettingsModal() { document.getElementById('appSettingsModal').classList.add('active'); }
     function toggleAppSettingsModal(show) {
       const modal = document.getElementById('appSettingsModal');
-      if (show) modal.classList.add('active');
-      else modal.classList.remove('active');
+      if (show) modal.classList.add('active'); else modal.classList.remove('active');
     }
 
-    let brandClickCount = 0;
-    let brandClickTimer = null;
+    let brandClickCount = 0, brandClickTimer = null;
     document.getElementById('topBrandLogo')?.addEventListener('click', () => {
       brandClickCount++;
       clearTimeout(brandClickTimer);
@@ -1393,15 +1345,11 @@
       if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
       document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
       if (btnEl) btnEl.classList.add('active');
-
       document.querySelectorAll('.view-screen').forEach(s => s.classList.remove('active'));
       const target = document.getElementById('view-' + tabName);
       if (target) target.classList.add('active');
       window.scrollTo(0, 0);
-
-      if (tabName === 'season') {
-        setTimeout(scrollToCurrentCalendarStage, 250);
-      }
+      if (tabName === 'season') setTimeout(scrollToCurrentCalendarStage, 250);
     }
 
     function openViewScreen(screenName) {
@@ -1414,14 +1362,10 @@
     function switchSeasonSubTab(subTab, btn) {
       document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-
       document.getElementById('seasonSubStandings').style.display = subTab === 'standings' ? 'block' : 'none';
       document.getElementById('seasonSubCalendar').style.display = subTab === 'calendar' ? 'block' : 'none';
       document.getElementById('seasonSubTeams').style.display = subTab === 'teams' ? 'block' : 'none';
-
-      if (subTab === 'calendar') {
-        setTimeout(scrollToCurrentCalendarStage, 150);
-      }
+      if (subTab === 'calendar') setTimeout(scrollToCurrentCalendarStage, 150);
     }
 
     function scrollToCurrentCalendarStage() {
@@ -1429,416 +1373,14 @@
       if (currentCard) currentCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    function renderDriversList(drivers) {
-      const list = drivers || DEFAULT_DRIVERS_DATA;
-      if (!list || list.length === 0) return;
-
-      const TEAM_COLORS = {
-        "mclaren": "#FF8000",
-        "ferrari": "#E80020",
-        "mercedes": "#00A19B",
-        "red bull": "#0600EF",
-        "aston martin": "#229971",
-        "alpine": "#0090FF",
-        "haas": "#ED1A3B",
-        "rb": "#1534CC",
-        "racing bulls": "#1534CC",
-        "williams": "#00A0E9",
-        "sauber": "#00E701",
-        "audi": "#000000",
-        "cadillac": "#222222"
-      };
-
-      function getTeamColor(teamName) {
-        const t = (teamName || "").toLowerCase();
-        for (const key in TEAM_COLORS) {
-          if (t.includes(key)) return TEAM_COLORS[key];
-        }
-        return "#7e8494";
-      }
-
-      function getDriverImage(name) {
-        let lastName = name.split(' ').pop().toLowerCase();
-        lastName = lastName.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
-        if (lastName === 'russell') lastName = 'russel';
-        return `https://raw.githubusercontent.com/Webssterr/f1/main/images/${lastName}.png`;
-      }
-
-      const leader = list[0];
-      const leaderColor = getTeamColor(leader.team);
-      const leaderImg = getDriverImage(leader.name);
-
-      document.getElementById('leaderNameDisplay').innerText = leader.name;
-      document.getElementById('leaderTeamDisplay').innerText = leader.team;
-      document.getElementById('leaderPointsDisplay').innerText = leader.points;
-      document.getElementById('leaderWinsDisplay').innerText = `${leader.wins || 0} побед • лидер чемпионата`;
-      
-      const leaderCard = document.querySelector('.leader-card');
-      leaderCard.style.background = `linear-gradient(135deg, ${leaderColor} 0%, #111317 120%)`;
-      leaderCard.style.borderBottom = `4px solid ${leaderColor}`;
-      
-      let lPhoto = document.getElementById('leaderPhotoEl');
-      if (!lPhoto) {
-        lPhoto = document.createElement('img');
-        lPhoto.id = 'leaderPhotoEl';
-        lPhoto.style.cssText = 'position:absolute; right:-10px; bottom:0; height:120%; object-fit:contain; z-index:1; pointer-events:none; filter: drop-shadow(-4px 0 12px rgba(0,0,0,0.4));';
-        leaderCard.appendChild(lPhoto);
-        
-        const leaderBgNum = document.querySelector('.leader-bg-num');
-        if (leaderBgNum) leaderBgNum.style.zIndex = '0';
-        const leaderTexts = leaderCard.querySelectorAll('.leader-badge, .leader-name, .leader-team, .leader-pts-row');
-        leaderTexts.forEach(el => { el.style.position = 'relative'; el.style.zIndex = '2'; });
-      }
-      lPhoto.src = leaderImg;
-
-      const driversListEl = document.getElementById('driversStandingsList');
-      driversListEl.innerHTML = list.slice(1).map(d => {
-        const teamColor = getTeamColor(d.team);
-        const gradientBg = `${teamColor}26`; 
-        const fallbackInitials = d.name.split(' ').map(n => n[0]).join('').substring(0, 2);
-        const imgUrl = getDriverImage(d.name);
-
-        return `
-          <div class="stand-item" style="
-            background: linear-gradient(90deg, ${gradientBg} 0%, transparent 80%);
-            border-left: 4px solid ${teamColor};
-            padding: 8px 16px;
-            margin-bottom: 8px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-          ">
-            <div class="stand-pos" style="width: 28px; font-size: 15px; font-weight: 900; color: var(--text-muted);">${String(d.pos).padStart(2, '0')}</div>
-            
-            <div style="width: 46px; height: 46px; border-radius: 50%; background: ${teamColor}40; margin-right: 14px; border: 2px solid ${teamColor}; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;">
-              <span style="position: absolute; font-weight: 800; color: ${teamColor}; font-size: 14px;">${fallbackInitials}</span>
-              <img src="${imgUrl}" onload="this.previousElementSibling.style.display='none'" style="width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 2;" onerror="this.style.display='none'">
-            </div>
-            
-            <div class="stand-details" style="flex: 1; z-index: 2;">
-              <div class="stand-name" style="font-size: 16px; font-weight: 800; color: var(--text);">${d.name}</div>
-              <div class="stand-team" style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">${d.team}</div>
-            </div>
-            
-            <div class="stand-pts" style="font-size: 18px; font-weight: 900; color: var(--text); z-index: 2;">${d.points}</div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderCalendarList(races) {
-      const list = races || DEFAULT_RACES_CALENDAR;
-      const calEl = document.getElementById('calendarEventsList');
-      
-      const nowTs = Date.now();
-      let activeRace = list.find(r => {
-        const raceTime = new Date(r.date + "T" + (r.time || "14:00:00")).getTime();
-        return (raceTime + 10800000) >= nowTs; 
-      });
-      const currentStageIndex = activeRace ? parseInt(activeRace.round) : (parseInt(window.activeRaceRound) || 17);
-
-      calEl.innerHTML = list.map((r, idx) => {
-        const roundNum = parseInt(r.round) || (idx + 1);
-        let statusBadge = '';
-        let cardClass = 'cal-card';
-
-        if (roundNum < currentStageIndex) {
-          cardClass += ' past';
-          statusBadge = '<span style="font-size:11px; font-weight:800; color:var(--text-muted);">ЗАВЕРШЕН</span>';
-        } else if (roundNum === currentStageIndex) {
-          cardClass += ' current';
-          statusBadge = '<span class="badge">ТЕКУЩИЙ ЭТАП</span>';
-        } else if (roundNum === currentStageIndex + 1) {
-          statusBadge = '<span class="badge" style="background:#fff3cd; color:#856404;">СЛЕДУЮЩИЙ</span>';
-        } else {
-          statusBadge = `<span style="font-size:12px; color:var(--text-muted);">${r.date}</span>`;
-        }
-
-        return `
-          <div class="${cardClass}" id="cal-round-${roundNum}">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <div class="cal-round">${String(roundNum).padStart(2, '0')}</div>
-              <div class="cal-info">
-                <h4>${r.name}</h4>
-                <span>${r.circuit}</span>
-              </div>
-            </div>
-            ${statusBadge}
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function loadF1SeasonData() {
-      try {
-        const response = await fetch(`${WORKER_URL}/api/season/live`);
-        const data = await response.json();
-
-        let driversData = DEFAULT_DRIVERS_DATA;
-        if (data.drivers && data.drivers.length > 0) {
-          driversData = data.drivers;
-          renderDriversList(data.drivers);
-        } else {
-          renderDriversList(DEFAULT_DRIVERS_DATA);
-        }
-
-        initPredictionGame(driversData);
-
-        if (data.constructors && data.constructors.length > 0) {
-          const teamsListEl = document.getElementById('constructorsStandingsList');
-          teamsListEl.innerHTML = data.constructors.map(t => `
-            <div class="stand-item">
-              <div class="stand-pos ${parseInt(t.pos) <= 3 ? 'top' : ''}">${t.pos}</div>
-              <div class="stand-details">
-                <div class="stand-name">${t.team}</div>
-              </div>
-              <div class="stand-pts">${t.points}</div>
-            </div>
-          `).join('');
-        }
-
-        if (data.races && data.races.length > 0) {
-          renderCalendarList(data.races);
-          
-          const nowTs = Date.now();
-          let activeRace = data.races.find(r => {
-            const raceTime = new Date(r.date + "T" + (r.time || "14:00:00")).getTime();
-            return (raceTime + 10800000) >= nowTs; 
-          });
-          
-          if (!activeRace) activeRace = data.races[data.races.length - 1];
-
-          if (activeRace) {
-            window.activeRaceRound = activeRace.round; 
-            document.getElementById('gpTitleDisplay').innerText = activeRace.name;
-            document.getElementById('gpSubDisplay').innerText = `Этап ${activeRace.round} • ${activeRace.circuit}`;
-            const circuitKey = activeRace.circuitId || "sepang";
-            loadCircuitFromDatabase(circuitKey);
-            initDynamicWeekendSessions(activeRace);
-          }
-        }
-      } catch (e) {
-        renderDriversList(DEFAULT_DRIVERS_DATA);
-        renderCalendarList(DEFAULT_RACES_CALENDAR);
-        initPredictionGame(DEFAULT_DRIVERS_DATA);
-        initDynamicWeekendSessions(null);
-      }
-    }
-
-    async function loadCatalogDatabase() {
-      try {
-        const res = await fetch(`${WORKER_URL}/api/catalog`);
-        const rows = await res.json();
-        allCatalogItems = rows || [];
-        catalogTree = {};
-
-        rows.forEach(item => {
-          const cat = item.category || 'Архив';
-          const title = item.title;
-          if (!catalogTree[cat]) catalogTree[cat] = {};
-          if (!catalogTree[cat][title]) catalogTree[cat][title] = { image: item.image, description: item.description, items: [] };
-          catalogTree[cat][title].items.push(item);
-        });
-
-        let html = '';
-        for (const catName in catalogTree) {
-          html += `
-            <div class="menu-btn" onclick="openCatalogCategory('${catName}')">
-              <div class="menu-btn-content"><span>${catName}</span></div>
-              <span style="opacity:0.4;">›</span>
-            </div>
-          `;
-        }
-        document.getElementById('catalogCategoriesContainer').innerHTML = html;
-        if (isAdmin) {
-          renderAdminCatalogList(allCatalogItems);
-          renderAdminCategoriesOrder(); // 👈 Добавлено сюда
-        }
-      } catch (e) {
-        document.getElementById('catalogCategoriesContainer').innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted);">Ошибка подключения к D1.</div>';
-      }
-    }
-
-    function openCatalogCategory(categoryName) {
-      activeCatalogCategory = categoryName;
-      const listEl = document.getElementById('catalogTitlesList');
-      listEl.innerHTML = '';
-
-      for (const titleKey in catalogTree[categoryName]) {
-        const itemObj = catalogTree[categoryName][titleKey];
-        const thumb = itemObj.image ? `<img class="menu-btn-thumb" src="${itemObj.image}">` : '';
-        const btn = document.createElement('div');
-        btn.className = 'menu-btn';
-        btn.innerHTML = `<div class="menu-btn-content">${thumb}<span>${titleKey}</span></div><span>›</span>`;
-        btn.onclick = () => openCatalogDetails(titleKey);
-        listEl.appendChild(btn);
-      }
-      openViewScreen('titles');
-    }
-
-    function openCatalogDetails(titleKey) {
-      const data = catalogTree[activeCatalogCategory][titleKey];
-      const header = document.getElementById('catalogItemHeader');
-      const btnsBox = document.getElementById('catalogItemButtonsList');
-
-      header.innerHTML = `
-        ${data.image ? `<img src="${data.image}" style="width:100%; max-height:220px; object-fit:cover; border-radius:18px; margin-bottom:12px;">` : ''}
-        <h2 style="margin:0 0 6px 0; font-size:22px; font-weight:900;">${titleKey}</h2>
-        ${data.description ? `<div style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">${data.description}</div>` : ''}
-      `;
-
-      btnsBox.innerHTML = '';
-      data.items.forEach(it => {
-        const b = document.createElement('div');
-        b.className = 'menu-btn';
-        b.innerHTML = `<span>${it.item}</span><span class="badge">${it.badge || '1080p'}</span>`;
-        b.onclick = () => {
-          if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-          tg?.openTelegramLink(`https://t.me/${BOT_USERNAME}?start=${it.code}`);
-          tg?.close();
-        };
-        btnsBox.appendChild(b);
-      });
-      openViewScreen('details');
-    }
-
-    function navigateBackFromTitles() {
-      openViewScreen('archive');
-    }
-
-    function handleSearch(queryText) {
-      const query = queryText.trim().toLowerCase();
-      const def = document.getElementById('archiveDefaultList');
-      const res = document.getElementById('archiveSearchResults');
-      if (!query) {
-        def.style.display = 'block';
-        res.style.display = 'none';
-        return;
-      }
-      def.style.display = 'none';
-      res.style.display = 'block';
-      res.innerHTML = '';
-
-      const matched = allCatalogItems.filter(e => e.title.toLowerCase().includes(query) || e.item.toLowerCase().includes(query));
-      if (!matched.length) {
-        res.innerHTML = '<div style="text-align:center; padding:35px 0; color:var(--text-muted);">Ничего не найдено 🏎</div>';
-        return;
-      }
-
-      matched.forEach(e => {
-        const b = document.createElement('div');
-        b.className = 'menu-btn';
-        b.innerHTML = `<span>${e.title} — ${e.item}</span><span class="badge">${e.badge || '1080p'}</span>`;
-        b.onclick = () => {
-          tg?.openTelegramLink(`https://t.me/${BOT_USERNAME}?start=${e.code}`);
-          tg?.close();
-        };
-        res.appendChild(b);
-      });
-    }
-
-    function openAdminDashboardScreen() {
-      openViewScreen('admin');
-      loadAdminLiveStats();
-      renderAdminCategoriesOrder(); // 👈 Добавлено сюда
-    }
-
-    function navigateBackFromAdmin() {
-      openViewScreen('home');
-    }
-
-    async function loadAdminLiveStats() {
-      try {
-        const res = await fetch(`${WORKER_URL}/api/stats`, { headers: { 'X-Admin-Id': ADMIN_ID } });
-        const stats = await res.json();
-        document.getElementById('statTotalUsers').innerText = stats.total_users || 0;
-        document.getElementById('statActive24').innerText = stats.active_24h || 0;
-        document.getElementById('statViewsToday').innerText = stats.views_today || 0;
-        document.getElementById('statVideoClicks').innerText = stats.video_clicks || 0;
-
-        const curVer = stats.current_version || 'v1';
-        document.getElementById('adminCurVerText').innerText = curVer.toUpperCase();
-        document.getElementById('adminToggleVersionBtn').innerText = curVer === 'v2' 
-          ? 'Откатить релиз до v1 для всех' 
-          : 'Выкатить v2 для всех пользователей';
-      } catch (e) {}
-    }
-
-    async function toggleGlobalSystemVersion() {
-      const cur = document.getElementById('adminCurVerText').innerText.toLowerCase();
-      const target = cur === 'v2' ? 'v1' : 'v2';
-      if (!confirm(`Переключить версию для всех пользователей на ${target.toUpperCase()}?`)) return;
-
-      const res = await fetch(`${WORKER_URL}/api/system/set_version`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
-        body: JSON.stringify({ version: target })
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert(`✅ Глобальная версия переключена на ${target.toUpperCase()}!`);
-        loadAdminLiveStats();
-      }
-    }
-
-    function saveAdminCurrentWeekendConfig() {
-      const circuitKey = document.getElementById('admActiveCircuitSelect').value;
-      const gpTitle = document.getElementById('admActiveGpTitle').value;
-      const gpSub = document.getElementById('admActiveGpSub').value;
-
-      const config = { circuitKey, gpTitle, gpSub };
-      localStorage.setItem('f1_custom_weekend_config', JSON.stringify(config));
-
-      applySavedWeekendConfig();
-      loadCircuitFromDatabase(circuitKey);
-      alert("✅ Настройки Гран-при применены к главной странице!");
-      openViewScreen('home');
-    }
-
-    function applySavedWeekendConfig() {
-      const raw = localStorage.getItem('f1_custom_weekend_config');
-      if (!raw) return;
-      try {
-        const config = JSON.parse(raw);
-        if (config.gpTitle) document.getElementById('gpTitleDisplay').innerText = config.gpTitle;
-        if (config.gpSub) document.getElementById('gpSubDisplay').innerText = config.gpSub;
-        if (config.circuitKey) loadCircuitFromDatabase(config.circuitKey);
-
-        const sel = document.getElementById('admActiveCircuitSelect');
-        const tit = document.getElementById('admActiveGpTitle');
-        const sub = document.getElementById('admActiveGpSub');
-        if (sel) sel.value = config.circuitKey;
-        if (tit) tit.value = config.gpTitle;
-        if (sub) sub.value = config.gpSub;
-      } catch (e) {}
-    }
-
-    function handleAdminSearch(val) {
-      const q = val.trim().toLowerCase();
-      const filtered = allCatalogItems.filter(i => 
-        i.title.toLowerCase().includes(q) || 
-        i.item.toLowerCase().includes(q) || 
-        i.code.toLowerCase().includes(q)
-      );
-      renderAdminCatalogList(filtered);
-    }
-
     function renderAdminCatalogList(itemsToRender) {
       const box = document.getElementById('adminCatalogRecordsManageList');
       if (!box) return;
       const list = itemsToRender || allCatalogItems;
-
-      if (!list.length) {
-        box.innerHTML = '<div style="font-size:12px; color:var(--text-muted); text-align:center; padding:15px;">Записей не найдено</div>';
-        return;
-      }
-
+      if (!list.length) { box.innerHTML = '<div style="font-size:12px; color:var(--text-muted); text-align:center; padding:15px;">Записей не найдено</div>'; return; }
       box.innerHTML = list.map(item => `
         <div style="display:flex; justify-content:space-between; align-items:center; background:var(--card-sub); padding:10px 14px; border-radius:12px; border:1px solid var(--border);">
-          <div style="font-size:13px; font-weight:700;">
-            ${item.title} — ${item.item}
-            <div style="font-size:11px; color:var(--text-muted);">Код: ${item.code} | ID: ${item.post_id}</div>
-          </div>
+          <div style="font-size:13px; font-weight:700;">${item.title} — ${item.item}<div style="font-size:11px; color:var(--text-muted);">Код: ${item.code} | ID: ${item.post_id}</div></div>
           <div style="display:flex; gap:6px;">
             <button class="icon-circle-btn" style="width:32px; height:32px; font-size:13px;" onclick="editCatalogRecord(${item.id})">✏️</button>
             <button class="icon-circle-btn" style="width:32px; height:32px; font-size:13px; color:var(--accent);" onclick="deleteCatalogRecord(${item.id})">🗑</button>
@@ -1850,12 +1392,10 @@
     function handleImageFileUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = function(evt) {
-        const base64Data = evt.target.result;
-        document.getElementById('admFormImg').value = base64Data;
-        document.getElementById('admImgPreviewEl').src = base64Data;
+        document.getElementById('admFormImg').value = evt.target.result;
+        document.getElementById('admImgPreviewEl').src = evt.target.result;
         document.getElementById('admImgPreviewBox').style.display = 'block';
       };
       reader.readAsDataURL(file);
@@ -1864,7 +1404,6 @@
     function editCatalogRecord(id) {
       const record = allCatalogItems.find(r => r.id === id);
       if (!record) return;
-
       document.getElementById('adminEditRecordId').value = record.id;
       document.getElementById('admFormCat').value = record.category;
       document.getElementById('admFormTitle').value = record.title;
@@ -1874,14 +1413,10 @@
       document.getElementById('admFormBadge').value = record.badge || '1080p';
       document.getElementById('admFormCode').value = record.code;
       document.getElementById('admFormPostId').value = record.post_id;
-
       if (record.image) {
         document.getElementById('admImgPreviewEl').src = record.image;
         document.getElementById('admImgPreviewBox').style.display = 'block';
-      } else {
-        document.getElementById('admImgPreviewBox').style.display = 'none';
-      }
-
+      } else { document.getElementById('admImgPreviewBox').style.display = 'none'; }
       document.getElementById('adminFormHeaderTitle').innerText = '✏️ Редактировать запись';
       document.getElementById('adminSubmitRecordBtn').innerText = '💾 Обновить запись';
       document.getElementById('adminCancelEditBtn').style.display = 'block';
@@ -1899,7 +1434,6 @@
       document.getElementById('admFormCode').value = '';
       document.getElementById('admFormPostId').value = '';
       document.getElementById('admImgPreviewBox').style.display = 'none';
-
       document.getElementById('adminFormHeaderTitle').innerText = '➕ Добавить запись в базу D1';
       document.getElementById('adminSubmitRecordBtn').innerText = '💾 Сохранить запись';
       document.getElementById('adminCancelEditBtn').style.display = 'none';
@@ -1917,41 +1451,19 @@
         code: document.getElementById('admFormCode').value,
         post_id: document.getElementById('admFormPostId').value,
       };
-
-      if (!payload.category || !payload.title || !payload.item || !payload.code || !payload.post_id) {
-        alert('Заполните все обязательные поля!');
-        return;
-      }
-
+      if (!payload.category || !payload.title || !payload.item || !payload.code || !payload.post_id) { alert('Заполните все обязательные поля!'); return; }
       if (editId) {
-        await fetch(`${WORKER_URL}/api/catalog/delete`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
-          body: JSON.stringify({ id: editId })
-        });
+        await fetch(`${WORKER_URL}/api/catalog/delete`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID }, body: JSON.stringify({ id: editId }) });
       }
-
-      const res = await fetch(`${WORKER_URL}/api/catalog/add`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
-        body: JSON.stringify(payload)
-      });
+      const res = await fetch(`${WORKER_URL}/api/catalog/add`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID }, body: JSON.stringify(payload) });
       const data = await res.json();
-      if (data.success) {
-        alert(editId ? '✅ Запись успешно обновлена!' : '✅ Запись успешно создана в D1!');
-        cancelCatalogEditMode();
-        loadCatalogDatabase();
-      }
+      if (data.success) { alert(editId ? '✅ Запись успешно обновлена!' : '✅ Запись успешно создана в D1!'); cancelCatalogEditMode(); loadCatalogDatabase(); }
     }
 
     async function deleteCatalogRecord(id) {
       if (!confirm('Удалить эту запись из архива?')) return;
       try {
-        const res = await fetch(`${WORKER_URL}/api/catalog/delete`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
-          body: JSON.stringify({ id })
-        });
+        const res = await fetch(`${WORKER_URL}/api/catalog/delete`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID }, body: JSON.stringify({ id }) });
         const data = await res.json();
         if (data.success) loadCatalogDatabase();
       } catch (err) {}
@@ -1961,77 +1473,33 @@
       try {
         initThemeAndPreferences();
         loadCatalogDatabase();
-
         const hasBetaAccess = isAdmin || isTester;
         let globalVersion = 'v1';
         if (!hasBetaAccess) {
           try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2000);
+            const controller = new AbortController(), timeoutId = setTimeout(() => controller.abort(), 2000);
             const res = await fetch(`${WORKER_URL}/api/system/version`, { signal: controller.signal });
             clearTimeout(timeoutId);
             const data = await res.json();
             globalVersion = data.version || 'v1';
-          } catch (e) {
-            globalVersion = 'v1';
-          }
+          } catch (e) { globalVersion = 'v1'; }
         }
-
         if (!hasBetaAccess && globalVersion !== 'v2') {
           const nav = document.querySelector('.bottom-nav');
           if (nav) nav.style.display = 'none';
           openViewScreen('archive');
           return;
         }
-
         loadCircuitFromDatabase("sepang");
         loadF1SeasonData();
-      } catch (fatalErr) {
-        openViewScreen('archive');
-      }
+      } catch (fatalErr) { openViewScreen('archive'); }
     }
-
-    async function checkAppVersion() {
-      try {
-        const res = await fetch('https://твой-воркер.workers.dev/api/app-config'); 
-        const data = await res.json();
-        if (data.success) {
-          const versionLabel = document.getElementById('currentVersionLabel');
-          if (versionLabel) versionLabel.innerText = data.version.toUpperCase();
-        }
-      } catch (e) {}
-    }
-
-    document.getElementById('deployV2Btn')?.addEventListener('click', async () => {
-      if (!confirm("Переключить версию для всех пользователей на V2?")) return;
-      
-      try {
-        const res = await fetch(`${WORKER_URL}/api/admin/set-version`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ version: 'v2', adminId: '301211351' })
-        });
-        const data = await res.json();
-        if (data.success) {
-          alert("Версия V2 успешно активирована для всех!");
-          location.reload();
-        } else {
-          alert("Ошибка сохранения");
-        }
-      } catch (e) { alert("Ошибка сети"); }
-    });
 
     function renderAdminCategoriesOrder() {
       const box = document.getElementById('adminCategoriesOrderList');
       if (!box) return;
-
       const categories = [...new Set(allCatalogItems.map(i => i.category))];
-      
-      if (!categories.length) {
-        box.innerHTML = '<div style="font-size:12px; color:var(--text-muted); text-align:center;">Нет категорий</div>';
-        return;
-      }
-
+      if (!categories.length) { box.innerHTML = '<div style="font-size:12px; color:var(--text-muted); text-align:center;">Нет категорий</div>'; return; }
       box.innerHTML = categories.map((cat, idx) => `
         <div style="display:flex; justify-content:space-between; align-items:center; background:var(--card-sub); padding:10px 14px; border-radius:12px; border:1px solid var(--border);">
           <span style="font-size:14px; font-weight:800;">${cat}</span>
@@ -2044,90 +1512,48 @@
     }
 
     async function moveCategoryOrder(index, direction) {
-      const categories = [...new Set(allCatalogItems.map(i => i.category))];
-      const targetIndex = index + direction;
-      
+      const categories = [...new Set(allCatalogItems.map(i => i.category))], targetIndex = index + direction;
       if (targetIndex < 0 || targetIndex >= categories.length) return;
-
-      const temp = categories[index];
-      categories[index] = categories[targetIndex];
-      categories[targetIndex] = temp;
-
+      const temp = categories[index]; categories[index] = categories[targetIndex]; categories[targetIndex] = temp;
       const payloadCategories = categories.map((cat, order) => ({ category: cat, order }));
-
       try {
-        const res = await fetch(`${WORKER_URL}/api/catalog/reorder`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
-          body: JSON.stringify({ categories: payloadCategories })
-        });
+        const res = await fetch(`${WORKER_URL}/api/catalog/reorder`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID }, body: JSON.stringify({ categories: payloadCategories }) });
         const data = await res.json();
-        if (data.success) {
-          loadCatalogDatabase();
-          renderAdminCategoriesOrder();
-        }
-      } catch (e) {
-        alert("Ошибка при сохранении порядка категорий");
-      }
+        if (data.success) { loadCatalogDatabase(); renderAdminCategoriesOrder(); }
+      } catch (e) { alert("Ошибка при сохранении порядка категорий"); }
     }
 
-    let f1GameState = 'IDLE'; 
-    let f1StartTime = 0;
-    let f1Timeout = null;
-    let f1Interval = null;
-
+    let f1GameState = 'IDLE', f1StartTime = 0, f1Timeout = null, f1Interval = null;
     document.getElementById('f1LightsBtn')?.addEventListener('click', () => {
-      const btn = document.getElementById('f1LightsBtn');
-      const lights = document.querySelectorAll('.f1-light');
-      const resultDiv = document.getElementById('f1LightsResult');
-
+      const btn = document.getElementById('f1LightsBtn'), lights = document.querySelectorAll('.f1-light'), resultDiv = document.getElementById('f1LightsResult');
       if (f1GameState === 'IDLE' || f1GameState === 'FINISHED') {
-        f1GameState = 'COUNTING';
-        btn.innerText = "ЖДИ ОГНИ...";
-        btn.style.background = "#333";
-        resultDiv.innerText = "";
-  
+        f1GameState = 'COUNTING'; btn.innerText = "ЖДИ ОГНИ..."; btn.style.background = "#333"; resultDiv.innerText = "";
         lights.forEach(l => l.style.background = "#2a2a35");
-
         let currentLight = 0;
         f1Interval = setInterval(() => {
-          if (currentLight < 5) {
-            lights[currentLight].style.background = "#e10600";
-            currentLight++;
-          } else {
-            clearInterval(f1Interval);
-            f1GameState = 'WAITING';
-            btn.innerText = "ТУШИ СВЕТ!";
-            btn.style.background = "#e10600";
-
-            const randomDelay = Math.random() * 2000 + 1000;
+          if (currentLight < 5) { lights[currentLight].style.background = "#e10600"; currentLight++; }
+          else {
+            clearInterval(f1Interval); f1GameState = 'WAITING'; btn.innerText = "ТУШИ СВЕТ!"; btn.style.background = "#e10600";
             f1Timeout = setTimeout(() => {
               lights.forEach(l => l.style.background = "#2a2a35");
               f1StartTime = performance.now();
               f1GameState = 'READY_TO_CLICK';
-            }, randomDelay);
+            }, Math.random() * 2000 + 1000);
           }
         }, 1000);
-
       } else if (f1GameState === 'WAITING') {
-        clearTimeout(f1Timeout);
-        clearInterval(f1Interval);
-        f1GameState = 'FALSE_START';
-        btn.innerText = "НАЖМИ ДЛЯ СТАРТА";
-        btn.style.background = "#e10600";
-        resultDiv.innerText = "❌ Фальстарт! Слишком рано.";
+        clearTimeout(f1Timeout); clearInterval(f1Interval); f1GameState = 'FALSE_START';
+        btn.innerText = "НАЖМИ ДЛЯ СТАРТА"; btn.style.background = "#e10600";
+        resultDiv.innerText = "❌ Фальстарт! Слишком рано. Попробуй еще раз.";
         lights.forEach(l => l.style.background = "#2a2a35");
-
+        f1GameState = 'IDLE';
       } else if (f1GameState === 'READY_TO_CLICK') {
         const reactionTime = Math.round(performance.now() - f1StartTime);
-        f1GameState = 'FINISHED';
-        btn.innerText = "ИГРАТЬ СНОВА";
-        btn.style.background = "#e10600";
+        f1GameState = 'FINISHED'; btn.innerText = "ИГРАТЬ СНОВА"; btn.style.background = "#e10600";
         resultDiv.innerText = `⏱ Твое время реакции: ${reactionTime} мс!`;
       }
     });
 
-    checkAppVersion();
     initAppRouting();
   </script>
 </body>
