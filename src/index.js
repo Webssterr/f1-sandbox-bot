@@ -1,3 +1,5 @@
+export default {
+  async fetch(request, env, ctx) {
 /**
  * Race Weekend F1 Archive — Full Production Monolith Worker
  * 
