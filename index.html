@@ -834,10 +834,46 @@
       color: var(--text-muted);
     }
     .achievement-card.unlocked .achievement-status { color: #34c759; }
+
+    /* --- СТИЛИ ВСПЛЫВАЮЩЕГО ОКНА АЧИВКИ (TOAST) --- */
+    .achievement-toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: var(--card-bg);
+      border: 2px solid #34c759;
+      color: var(--text);
+      padding: 14px 20px;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 99999;
+      transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      max-width: 90%;
+      width: 340px;
+    }
+    .achievement-toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast-icon { font-size: 32px; flex-shrink: 0; }
+    .toast-content h4 { margin: 0 0 2px 0; font-size: 13px; color: #34c759; text-transform: uppercase; font-weight: 800; }
+    .toast-content p { margin: 0; font-size: 13px; font-weight: 900; color: var(--text); }
   </style>
   <style id="ai-live-patch-style"></style>
 </head>
 <body>
+  <body>
+  <!-- ВСПЛЫВАЮЩЕЕ ОКНО НОВОЙ АЧИВКИ -->
+  <div id="achievementToast" class="achievement-toast">
+    <div class="toast-icon" id="toastIcon">🏆</div>
+    <div class="toast-content">
+      <h4>Новое достижение!</h4>
+      <p id="toastTitle">Название ачивки</p>
+    </div>
+  </div>
 
   <!-- Контейнер для дополнительных Live-патчей ИИ -->
   <div id="ai-live-patch-html"></div>
@@ -1081,6 +1117,7 @@
       <div class="garage-user-info">
         <h3 id="garageUserName">Пилот F1</h3>
         <p id="garageUserHandle">@username • ID: —</p>
+        <p id="garageUserRank" style="color: var(--accent); font-weight: 900; margin-top: 4px;">🏅 Картингист</p>
       </div>
     </div>
 
@@ -2211,13 +2248,92 @@
     // =========================================================================
     // ЛОГИКА ЭКРАНА "ГАРАЖ" (ПРОФИЛЬ, СТАТИСТИКА, ТЕХНИЧЕСКИЕ АЧИВКИ)
     // =========================================================================
+    // Шкала рангов от 0 до 850 очков
+    // Шкала рангов от 0 до 850 очков с бонусами за достижение
+    const F1_RANKS_SCALE = [
+      { threshold: 0, title: "🏎️ Картингист", bonusKey: "rank_bonus_0" },
+      { threshold: 50, title: "🏁 Пилот Формулы-4", bonusKey: "rank_bonus_50" },
+      { threshold: 150, title: "🚀 Пилот Формулы-3", bonusKey: "rank_bonus_150" },
+      { threshold: 300, title: "🏆 Пилот Формулы-2", bonusKey: "rank_bonus_300" },
+      { threshold: 500, title: "🔥 Пилот Формулы-1", bonusKey: "rank_bonus_500" },
+      { threshold: 700, title: "⚡ Легенда Паддока", bonusKey: "rank_bonus_700" },
+      { threshold: 850, title: "👑 Чемпион Мира F1", bonusKey: "rank_bonus_850" }
+    ];
+
+    function calculateUserRank(currentPts, userId) {
+      let maxPtsEver = parseInt(localStorage.getItem(`f1_max_pts_ever_${userId}`) || '0');
+      if (currentPts > maxPtsEver) {
+        maxPtsEver = currentPts;
+        localStorage.setItem(`f1_max_pts_ever_${userId}`, maxPtsEver);
+      }
+
+      let currentRankTitle = "🏎️ Картингист";
+      
+      for (const rank of F1_RANKS_SCALE) {
+        if (maxPtsEver >= rank.threshold) {
+          currentRankTitle = rank.title;
+          
+          // Проверяем, получал ли игрок бонус за этот ранг ранее
+          if (rank.threshold > 0) {
+            const rankBonusKey = `f1_ach_unlocked_${userId}_${rank.bonusKey}`;
+            if (localStorage.getItem(rankBonusKey) !== 'true') {
+              localStorage.setItem(rankBonusKey, 'true');
+              
+              // Начисляем бонус +50 PTS за новый ранг
+              let bonusPts = parseInt(localStorage.getItem(`f1_bonus_pts_${userId}`) || '0') + 50;
+              localStorage.setItem(`f1_bonus_pts_${userId}`, bonusPts);
+              
+              // Показываем всплывающее окно
+              setTimeout(() => {
+                showAchievementToast(`+50 PTS • Новый ранг: ${rank.title}!`, '🏆');
+              }, 600);
+            }
+          }
+        }
+      }
+      return currentRankTitle;
+    }
+
+    function showAchievementToast(title, icon) {
+      const toast = document.getElementById('achievementToast');
+      const titleEl = document.getElementById('toastTitle');
+      const iconEl = document.getElementById('toastIcon');
+      if (!toast || !titleEl) return;
+
+      titleEl.innerText = title;
+      if (icon) iconEl.innerText = icon;
+
+      toast.classList.add('show');
+      if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3800);
+    }
+
+    // Проверка и выдача ачивок с начислением +15 бонусных PTS
+    function checkAndAwardAchievement(achId, title, icon) {
+      const storageKey = `f1_ach_unlocked_${currentUserId}_${achId}`;
+      const isAlreadyUnlocked = localStorage.getItem(storageKey) === 'true';
+
+      if (!isAlreadyUnlocked) {
+        localStorage.setItem(storageKey, 'true');
+        
+        // Начисляем бонус +15 PTS
+        let bonusPts = parseInt(localStorage.getItem(`f1_bonus_pts_${currentUserId}`) || '0') + 15;
+        localStorage.setItem(`f1_bonus_pts_${currentUserId}`, bonusPts);
+
+        showAchievementToast(`+15 PTS • ${title}`, icon);
+      }
+    }
+    
     async function renderGarageProfileData() {
       const tgUser = tg?.initDataUnsafe?.user || {};
       
-      // Имя и юзернейм из Telegram
       const nameEl = document.getElementById('garageUserName');
       const handleEl = document.getElementById('garageUserHandle');
       const avatarEl = document.getElementById('garageAvatarEl');
+      const rankEl = document.getElementById('garageUserRank');
 
       const realName = `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim() || "Пилот Формулы-1";
       const realHandle = tgUser.username ? `@${tgUser.username}` : `ID: ${currentUserId}`;
@@ -2225,33 +2341,39 @@
       if (nameEl) nameEl.innerText = realName;
       if (handleEl) handleEl.innerText = `${realHandle} • Участник сезона`;
 
-      // Аватарка из Telegram, если доступна
       if (tgUser.photo_url) {
         avatarEl.innerHTML = `<img src="${tgUser.photo_url}" style="width:100%; height:100%; object-fit:cover;">`;
       } else {
         avatarEl.innerText = realName.charAt(0).toUpperCase();
       }
 
-      // Подтягиваем статистику из базы/localStorage
-      let userPts = "0";
+      // Получаем очки из лидерборда БД + добавляем бонусные баллы за ачивки (+15 за штуку)
+      let basePts = 0;
       try {
         const res = await fetch(`${WORKER_URL}/api/prediction/leaderboard`);
         const data = await res.json();
         const me = (data.leaderboard || []).find(r => String(r.user_id) === String(currentUserId));
-        if (me) userPts = me.total_points || "0";
+        if (me) basePts = parseInt(me.total_points) || 0;
       } catch (e) {
-        userPts = localStorage.getItem('f1_user_pred_points') || "0";
+        basePts = parseInt(localStorage.getItem('f1_user_pred_points') || '0');
       }
 
-      document.getElementById('garageStatPts').innerText = `${userPts} PTS`;
+      const bonusPts = parseInt(localStorage.getItem(`f1_bonus_pts_${currentUserId}`) || '0');
+      const totalUserPts = basePts + bonusPts;
+
+      document.getElementById('garageStatPts').innerText = `${totalUserPts} PTS`;
+
+      // Вычисляем и выводим ранг (с защитой исторического максимума при обнулении сезона)
+      if (rankEl) {
+        rankEl.innerText = calculateUserRank(totalUserPts);
+      }
 
       const bestReaction = localStorage.getItem('f1_best_reaction_time');
       document.getElementById('garageStatReaction').innerText = bestReaction ? `${bestReaction} ms` : '— ms';
 
-      const bestPit = localStorage.getItem('f1_best_pitstop_time'); // Сохраняется при идеальном пит-стопе
+      const bestPit = localStorage.getItem('f1_best_pitstop_time');
       document.getElementById('garageStatPit').innerText = bestPit ? `${bestPit} s` : '— s';
 
-      // Считаем количество отправленных прогнозов
       let votesCount = 0;
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -2259,9 +2381,8 @@
       }
       document.getElementById('garageStatVotes').innerText = votesCount;
 
-      // Рендеринг реальных технически отслеживаемых ачивок
       renderAchievementsList({
-        userPts: parseInt(userPts) || 0,
+        userPts: totalUserPts,
         bestReaction: parseInt(bestReaction) || 9999,
         bestPit: parseFloat(bestPit) || 99,
         votesCount: votesCount,
@@ -2273,107 +2394,33 @@
       const grid = document.getElementById('garageAchievementsGrid');
       if (!grid) return;
 
-      // Получаем дополнительные данные для проверки сложных ачивок из localStorage
-      const userVotesHistory = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith(`f1_pred_v2_${currentUserId}_r`)) {
-          try { userVotesHistory.push(JSON.parse(localStorage.getItem(key))); } catch(e) {}
-        }
-      }
-
-      // Проверка: ловил ли пользователь фальстарт в огнях
       const hasFalseStart = localStorage.getItem('f1_achievement_false_start') === 'true';
-      // Проверка: открывал ли админскую панель симуляции
       const foundAdminSim = localStorage.getItem('f1_achievement_admin_sim') === 'true';
-      // Проверка: заходил ли по прямой ссылке ?start=code
       const usedDeepLink = localStorage.getItem('f1_achievement_deeplink') === 'true';
-      // Проверка: количество просмотров видео из архива
       const archiveViewsCount = parseInt(localStorage.getItem('f1_archive_views_count') || '0');
-      // Проверка: ночной просмотр (00:00 - 05:00)
       const hasNightView = localStorage.getItem('f1_achievement_night_view') === 'true';
-      // Проверка: фастстарт / идеальная реакция < 210мс подряд
       const fastReactionCount = parseInt(localStorage.getItem('f1_fast_reactions_streak') || '0');
 
       const achievementsDefs = [
-        {
-          id: 'first_vote',
-          icon: '📝',
-          title: 'Первая кровь',
-          desc: 'Сделайте свой самый первый прогноз на этап.',
-          unlocked: stats.votesCount >= 1
-        },
-        {
-          id: 'veteran_tribun',
-          icon: '🏛️',
-          title: 'Ветеран трибун',
-          desc: 'Примите участие в предикшнах на 10 этапах сезона.',
-          unlocked: stats.votesCount >= 10
-        },
-        {
-          id: 'max_reaction',
-          icon: '⚡',
-          title: 'Реакция Макса',
-          desc: 'Продемонстрируйте время реакции на стартовых огнях быстрее 200 мс.',
-          unlocked: stats.bestReaction < 200 && stats.bestReaction > 0
-        },
-        {
-          id: 'false_start',
-          icon: '🚨',
-          title: 'Фальстарт!',
-          desc: 'Поторопитесь и нажмите на кнопку старта до погашения огней.',
-          unlocked: hasFalseStart
-        },
-        {
-          id: 'ferrari_crew',
-          icon: '🔧',
-          title: 'Бригада Ferrari',
-          desc: 'Пройдите «Пит-стоп челлендж» быстрее чем за 2.2 секунды без штрафов.',
-          unlocked: stats.bestPit <= 2.2 && stats.bestPit > 0
-        },
-        {
-          id: 'iron_nerves',
-          icon: '🏎️',
-          title: 'Железные нервы',
-          desc: 'Покажите идеальную реакцию на светофоре (менее 210 мс) 5 раз.',
-          unlocked: fastReactionCount >= 5
-        },
-        {
-          id: 'cinemaniac',
-          icon: '🎬',
-          title: 'Киноман Формулы 1',
-          desc: 'Посмотрите 5 полных записей заездов из архива через бота.',
-          unlocked: archiveViewsCount >= 5
-        },
-        {
-          id: 'night_view',
-          icon: '🌙',
-          title: 'Ночной просмотр',
-          desc: 'Откройте запись заезда в ночное время (с 00:00 до 05:00).',
-          unlocked: hasNightView
-        },
-        {
-          id: 'treasure_hunter',
-          icon: '🗺️',
-          title: 'Искатель сокровищ',
-          desc: 'Откройте архивный этап по прямой ссылке-приглашению (?start=code).',
-          unlocked: usedDeepLink
-        },
-        {
-          id: 'secret_advisor',
-          icon: '🕵️‍♂️',
-          title: 'Тайный советник',
-          desc: 'Найдите секретную админскую панель симуляции (5 кликов по какому то месту).',
-          unlocked: foundAdminSim
-        },
-        {
-          id: 'night_watch',
-          icon: '🖤',
-          title: 'Ночной дозор',
-          desc: 'Измените тему оформления приложения на темную.',
-          unlocked: stats.isDarkTheme
-        }
+        { id: 'first_vote', icon: '📝', title: 'Первая кровь', desc: 'Сделайте хотя бы 1 прогноз на этап.', unlocked: stats.votesCount >= 1 },
+        { id: 'veteran_tribun', icon: '🏛️', title: 'Ветеран трибун', desc: 'Примите участие в предикшнах на 10 этапах сезона.', unlocked: stats.votesCount >= 10 },
+        { id: 'max_reaction', icon: '⚡', title: 'Реакция Макса', desc: 'Продемонстрируйте время реакции быстрее 200 мс.', unlocked: stats.bestReaction < 200 && stats.bestReaction > 0 },
+        { id: 'false_start', icon: '🚨', title: 'Фальстарт!', desc: 'Поторопитесь и нажмите кнопку старта до погашения огней.', unlocked: hasFalseStart },
+        { id: 'ferrari_crew', icon: '🔧', title: 'Бригада Ferrari', desc: 'Пройдите пит-стоп быстрее чем за 2.2 сек.', unlocked: stats.bestPit <= 2.2 && stats.bestPit > 0 },
+        { id: 'iron_nerves', icon: '🏎️', title: 'Железные нервы', desc: 'Покажите идеальную реакцию (<210мс) 5 раз.', unlocked: fastReactionCount >= 5 },
+        { id: 'cinemaniac', icon: '🎬', title: 'Киноман F1', desc: 'Посмотрите 5 полных записей заездов из архива.', unlocked: archiveViewsCount >= 5 },
+        { id: 'night_view', icon: '🌙', title: 'Ночной просмотр', desc: 'Откройте заезд в ночное время (00:00 - 05:00).', unlocked: hasNightView },
+        { id: 'treasure_hunter', icon: '🗺️', title: 'Искатель сокровищ', desc: 'Откройте архивный этап по прямой ссылке (?start=code).', unlocked: usedDeepLink },
+        { id: 'secret_advisor', icon: '🕵️‍♂️', title: 'Тайный советник', desc: 'Найдите секретную админ-панель симуляции.', unlocked: foundAdminSim },
+        { id: 'night_watch', icon: '🖤', title: 'Ночной дозор', desc: 'Измените тему оформления приложения на темную.', unlocked: stats.isDarkTheme }
       ];
+
+      // Проверяем и выдаем бонусы за разблокированные ачивки
+      achievementsDefs.forEach(ach => {
+        if (ach.unlocked) {
+          checkAndAwardAchievement(ach.id, ach.title, ach.icon);
+        }
+      });
 
       grid.innerHTML = achievementsDefs.map(ach => `
         <div class="achievement-card ${ach.unlocked ? 'unlocked' : ''}">
