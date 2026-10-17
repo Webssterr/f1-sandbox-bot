@@ -858,7 +858,7 @@
     <!-- Подвкладки Игр -->
     <div class="games-subtabs-nav" id="gamesSubtabsNav">
       <button class="games-subtab-btn active" onclick="switchGamesSubTab('pred', this)">🏎️ Предикшн</button>
-      <button class="games-subtab-btn" onclick="switchGamesSubTab('lights', this)">🚦 Огни старта</button>
+      <button class="games-subtab-btn" onclick="switchGamesSubTab('lights', this)">🚦 Стартовые огни</button>
       <button class="games-subtab-btn" onclick="switchGamesSubTab('pitstop', this)">🔧 Пит-стоп</button>
     </div>
 
@@ -874,7 +874,7 @@
           <span class="f1-pred-badge f1-badge-active" id="predRoundBadge" onclick="handleSecretSimTap()">Раунд 18 / 23 • Сезон 2026</span>
         </div>
 
-        <!-- Форма прогноза на актуальный этап -->
+        <!-- Форма прогноза на актуальный этап (Без Safety Car) -->
         <div class="pred-stage-card">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
@@ -894,14 +894,6 @@
             <select id="pred-fl-select" class="pred-driver-select"></select>
           </div>
 
-          <div>
-            <label style="font-size:12px; color:var(--text-muted); font-weight:700; display:block; margin-bottom:6px;">🚨 Выезд Safety Car (+5 очков):</label>
-            <select id="pred-sc-select" class="pred-driver-select">
-              <option value="Да">Да, будет Safety Car</option>
-              <option value="Нет">Нет, чистая гонка</option>
-            </select>
-          </div>
-
           <button id="pred-submit-btn" class="pred-vote-btn" onclick="submitUserPredictionV2()">
             Отправить прогноз
           </button>
@@ -914,7 +906,7 @@
             <span class="badge">ADMIN ONLY</span>
           </div>
           <div style="font-size:12px; color:var(--text-muted);">
-            Выбери результаты этапа, чтобы автоматически рассчитать очки всем проголосовавшим в БД D1 и переключить раунд на следующий:
+            Выбери результаты этапа для ручного теста начисления очков в БД D1 (в реальных гонках очки начисляются автоматически):
           </div>
           <div>
             <label style="font-size:11px; font-weight:700; color:var(--text-muted);">Победитель (P1):</label>
@@ -923,13 +915,6 @@
           <div>
             <label style="font-size:11px; font-weight:700; color:var(--text-muted);">Быстрейший круг (FL):</label>
             <select id="sim-fl-select" class="pred-driver-select" style="margin-top:4px;"></select>
-          </div>
-          <div>
-            <label style="font-size:11px; font-weight:700; color:var(--text-muted);">Был ли Safety Car:</label>
-            <select id="sim-sc-select" class="pred-driver-select" style="margin-top:4px;">
-              <option value="Да">Да</option>
-              <option value="Нет">Нет</option>
-            </select>
           </div>
           <button class="pred-vote-btn" onclick="runAdminSettleStage()">🏁 Завершить этап и начислить очки</button>
         </div>
@@ -1373,7 +1358,6 @@
     function initPredictionGame(driversList) {
       const p1Select = document.getElementById('pred-p1-select');
       const flSelect = document.getElementById('pred-fl-select');
-      const scSelect = document.getElementById('pred-sc-select');
       const submitBtn = document.getElementById('pred-submit-btn');
       const statusBadge = document.getElementById('predStatusBadge');
       const roundBadge = document.getElementById('predRoundBadge');
@@ -1407,11 +1391,9 @@
           const v = JSON.parse(savedVoteRaw);
           if (v.p1) p1Select.value = v.p1;
           if (v.fl) flSelect.value = v.fl;
-          if (v.sc) scSelect.value = v.sc;
         } catch (e) {}
         p1Select.disabled = true;
         flSelect.disabled = true;
-        scSelect.disabled = true;
         submitBtn.disabled = true;
         submitBtn.innerText = "Прогноз успешно зафиксирован ✓";
         statusBadge.className = "f1-pred-badge f1-badge-settled";
@@ -1419,7 +1401,6 @@
       } else {
         p1Select.disabled = false;
         flSelect.disabled = false;
-        scSelect.disabled = false;
         submitBtn.disabled = false;
         submitBtn.innerText = "Отправить прогноз";
         statusBadge.className = "f1-pred-badge f1-badge-active";
@@ -1432,7 +1413,6 @@
     async function submitUserPredictionV2() {
       const p1 = document.getElementById('pred-p1-select').value;
       const fl = document.getElementById('pred-fl-select').value;
-      const sc = document.getElementById('pred-sc-select').value;
       const currentRound = String(window.activeRaceRound || "18");
       const tgUser = tg?.initDataUnsafe?.user || {};
 
@@ -1454,7 +1434,6 @@
             round: currentRound,
             driver_name: p1,
             fastest_lap: fl,
-            safety_car: sc,
             first_name: tgUser.first_name || "",
             last_name: tgUser.last_name || "",
             username: tgUser.username || ""
@@ -1463,10 +1442,9 @@
         const data = await res.json();
 
         if (data.success) {
-          localStorage.setItem(`f1_pred_v2_${currentUserId}_r${currentRound}`, JSON.stringify({ p1, fl, sc, ts: Date.now() }));
+          localStorage.setItem(`f1_pred_v2_${currentUserId}_r${currentRound}`, JSON.stringify({ p1, fl, ts: Date.now() }));
           document.getElementById('pred-p1-select').disabled = true;
           document.getElementById('pred-fl-select').disabled = true;
-          document.getElementById('pred-sc-select').disabled = true;
           btn.innerText = "Прогноз успешно зафиксирован ✓";
 
           const statusBadge = document.getElementById('predStatusBadge');
@@ -1492,15 +1470,14 @@
       const currentRound = String(window.activeRaceRound || "18");
       const p1 = document.getElementById('sim-p1-select').value;
       const fl = document.getElementById('sim-fl-select').value;
-      const sc = document.getElementById('sim-sc-select').value;
 
-      if (!confirm(`Завершить Раунд ${currentRound} (Победитель: ${p1}) и начислить очки всем участникам в БД?`)) return;
+      if (!confirm(`Завершить Раунд ${currentRound} (Победитель: ${p1}, Быстрейший круг: ${fl}) и начислить очки всем участникам в БД?`)) return;
 
       try {
         const res = await fetch(`${WORKER_URL}/api/prediction/settle`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
-          body: JSON.stringify({ round: currentRound, p1, fl, sc })
+          body: JSON.stringify({ round: currentRound, p1, fl })
         });
         const data = await res.json();
         if (data.success) {
