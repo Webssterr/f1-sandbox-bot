@@ -5,43 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Race Weekend F1 Archive</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0a0b10;
-      --card-bg: #11131a;
-      --card-sub: #181a24;
-      --border: rgba(255, 255, 255, 0.05);
-      --text: #ffffff;
-      --text-muted: #8c92a4;
-      --accent: #ff0000;
-      --accent-soft: rgba(255, 0, 0, 0.15);
-      --nav-bg: rgba(10, 11, 16, 0.95);
-      --track-base: #1f2330;
-      --input-bg: #161822;
+      --bg: #f4f5f8;
+      --card-bg: #ffffff;
+      --card-sub: #f8f9fc;
+      --border: #e6e8ee;
+      --text: #111317;
+      --text-muted: #7e8494;
+      --accent: #ff3b30;
+      --accent-soft: rgba(255, 59, 48, 0.12);
+      --nav-bg: rgba(255, 255, 255, 0.95);
+      --track-base: #e2e5ec;
+      --input-bg: #ffffff;
     }
 
     body.dark-theme {
-      --bg: #0a0b10;
-      --card-bg: #11131a;
-      --card-sub: #181a24;
-      --border: rgba(255, 255, 255, 0.05);
+      --bg: #0e1015;
+      --card-bg: #161820;
+      --card-sub: #1d202b;
+      --border: rgba(255, 255, 255, 0.08);
       --text: #ffffff;
       --text-muted: #8c92a4;
-      --accent: #ff0000;
-      --accent-soft: rgba(255, 0, 0, 0.15);
-      --nav-bg: rgba(10, 11, 16, 0.95);
-      --track-base: #1f2330;
-      --input-bg: #161822;
+      --accent: #ff3b30;
+      --accent-soft: rgba(255, 59, 48, 0.18);
+      --nav-bg: rgba(22, 24, 32, 0.95);
+      --track-base: #282c37;
+      --input-bg: #1c1f2a;
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -49,7 +39,7 @@
     body {
       background-color: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 16px 16px 95px 16px;
       -webkit-font-smoothing: antialiased;
@@ -523,33 +513,6 @@
 </head>
 <body>
 
-  <div id="lottie-loader" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg); z-index: 99999; display: flex; justify-content: center; align-items: center;"></div>
-  <script>
-    const lottieLoaderEl = document.getElementById('lottie-loader');
-
-    // A simple spinning circle animation JSON for lottie
-    const lottieAnimData = {"v":"5.5.2","fr":60,"ip":0,"op":60,"w":200,"h":200,"nm":"Circle","ddd":0,"assets":[],"layers":[{"ddd":0,"ind":1,"ty":4,"nm":"Shape Layer 1","sr":1,"ks":{"o":{"a":0,"k":100,"ix":11},"r":{"a":1,"k":[{"i":{"x":[0.833],"y":[0.833]},"o":{"x":[0.167],"y":[0.167]},"t":0,"s":[0]},{"t":60,"s":[360]}],"ix":10},"p":{"a":0,"k":[100,100,0],"ix":2},"a":{"a":0,"k":[0,0,0],"ix":1},"s":{"a":0,"k":[100,100,100],"ix":6}},"ao":0,"shapes":[{"ty":"gr","it":[{"d":1,"ty":"el","s":{"a":0,"k":[100,100],"ix":2},"p":{"a":0,"k":[0,0],"ix":3},"nm":"Ellipse Path 1","mn":"ADBE Vector Shape - Ellipse","hd":false},{"ty":"st","c":{"a":0,"k":[1,0.231,0.188,1],"ix":3},"o":{"a":0,"k":100,"ix":4},"w":{"a":0,"k":10,"ix":5},"lc":2,"lj":2,"bm":0,"nm":"Stroke 1","mn":"ADBE Vector Graphic - Stroke","hd":false},{"ty":"tr","p":{"a":0,"k":[0,0],"ix":2},"a":{"a":0,"k":[0,0],"ix":1},"s":{"a":0,"k":[100,100],"ix":3},"r":{"a":0,"k":0,"ix":6},"o":{"a":0,"k":100,"ix":7},"sk":{"a":0,"k":0,"ix":4},"sa":{"a":0,"k":0,"ix":5},"nm":"Transform"}],"nm":"Ellipse 1","np":3,"cix":2,"bm":0,"ix":1,"mn":"ADBE Vector Group","hd":false},{"ty":"tm","s":{"a":0,"k":0,"ix":1},"e":{"a":0,"k":75,"ix":2},"o":{"a":0,"k":0,"ix":3},"m":1,"ix":2,"nm":"Trim Paths 1","mn":"ADBE Vector Filter - Trim","hd":false}],"ip":0,"op":60,"st":0,"bm":0}]}
-
-    if (typeof lottie !== 'undefined') {
-      lottie.loadAnimation({
-        container: lottieLoaderEl,
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        animationData: lottieAnimData
-      });
-
-      // Hide loader after a simulated delay (e.g. 1.5 seconds)
-      setTimeout(() => {
-        lottieLoaderEl.style.opacity = '0';
-        lottieLoaderEl.style.transition = 'opacity 0.5s ease';
-        setTimeout(() => lottieLoaderEl.style.display = 'none', 500);
-      }, 1500);
-    } else {
-       lottieLoaderEl.style.display = 'none';
-    }
-  </script>
-
   <!-- ШАПКА -->
   <div class="app-header">
     <div class="brand-wrap" id="topBrandLogo">
@@ -579,14 +542,11 @@
 
       <!-- ВЕКТОР ТРАССЫ С АВТОЦЕНТРИРОВАНИЕМ -->
       <div class="track-viewport">
-        <!-- SVG is hidden but kept for path length calculations -->
-        <svg class="track-svg" id="trackSvgEl" viewBox="0 0 500 250" style="display: none;">
+        <svg class="track-svg" id="trackSvgEl" viewBox="0 0 500 250">
           <path id="trackPath" class="track-road" d="M 80,155 L 390,155 Q 410,155 405,140 Q 400,125 380,135 L 260,175 Q 240,180 250,200 L 275,225 Q 295,245 320,225 L 350,195 Q 370,175 400,195 L 435,215 Q 460,225 450,180 L 415,100 Q 395,50 340,55 L 260,65 Q 235,70 240,95 L 250,125 Q 245,145 220,135 L 140,135 Q 75,135 60,170 Q 55,200 95,200 L 370,200 Q 400,200 400,175 Q 400,155 380,155 Z" />
           <path class="track-racing-line" id="trackLine" d="M 80,155 L 390,155 Q 410,155 405,140 Q 400,125 380,135 L 260,175 Q 240,180 250,200 L 275,225 Q 295,245 320,225 L 350,195 Q 370,175 400,195 L 435,215 Q 460,225 450,180 L 415,100 Q 395,50 340,55 L 260,65 Q 235,70 240,95 L 250,125 Q 245,145 220,135 L 140,135 Q 75,135 60,170 Q 55,200 95,200 L 370,200 Q 400,200 400,175 Q 400,155 380,155 Z" />
           <circle id="carPoint" class="track-car-dot" r="6" cx="80" cy="155" />
         </svg>
-        <!-- Pixi.js Canvas Container -->
-        <div id="pixi-track-container" style="width: 100%; height: 100%; border-radius: 12px; overflow: hidden;"></div>
       </div>
 
       <h2 class="gp-title" id="gpTitleDisplay">Гран-при Сингапура</h2>
@@ -653,17 +613,8 @@
 
   <!-- ================= 4. ЭКРАН: ИГРЫ F1 + ПРЕДИКШН ================= -->
   <div id="view-games" class="view-screen">
-    <!-- ТАБЫ ВНУТРИ ИГР -->
-    <div style="display:flex; gap:8px; margin-bottom:16px; overflow-x:auto;">
-      <button class="btn-action" style="flex:1; padding:8px;" onclick="switchGamesTab('predict')">Предикты</button>
-      <button class="btn-action" style="flex:1; padding:8px; background:var(--card-sub);" onclick="switchGamesTab('fantasy')">Команда</button>
-      <button class="btn-action" style="flex:1; padding:8px; background:var(--card-sub);" onclick="switchGamesTab('quiz')">Квизы</button>
-    </div>
-
-    <!-- Вкладка: Предикты -->
-    <div id="games-tab-predict">
-      <!-- БЛОК ПРЕДИКШНА НА ГОНКУ -->
-      <div class="game-card" style="border: 2px solid var(--accent);">
+    <!-- БЛОК ПРЕДИКШНА НА ГОНКУ -->
+    <div class="game-card" style="border: 2px solid var(--accent);">
       <h3 style="margin:0 0 6px 0; font-size:18px; font-weight:900;">🏆 Предикшн на Гран-при</h3>
       <div style="font-size:13px; color:var(--text-muted); line-height:1.4; margin-bottom:14px;">
         Выберите победителя гонки (3 очка за 1 место, 2 за 2-е, 1 за 3-е). Прогноз можно сделать 1 раз!
@@ -713,55 +664,6 @@
       <div class="reaction-res" id="pitstopTimerDisplay" style="color:var(--text); font-size:22px;">2.00 сек</div>
       <button class="btn-action" style="margin-top:10px;" onclick="resetPitstopGame()">НАЧАТЬ ПИТ-СТОП</button>
     </div>
-    </div> <!-- end games-tab-predict -->
-
-    <!-- Вкладка: Fantasy Team -->
-    <div id="games-tab-fantasy" style="display:none;">
-      <div class="game-card">
-        <h3 style="margin:0 0 10px 0; font-size:18px; font-weight:900;">🏎️ Команда F1 (Fantasy)</h3>
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; padding:10px; background:var(--card-sub); border-radius:10px;">
-          <div style="font-size:12px; font-weight:700; color:var(--text-muted);">БЮДЖЕТ</div>
-          <div style="font-size:18px; font-weight:900; color:#00d95a;" id="fantasyBudgetDisplay">$100.0M</div>
-        </div>
-
-        <div style="margin-bottom:12px;">
-          <label style="font-size:11px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">ПИЛОТ 1</label>
-          <select id="fantasyDriver1" class="prediction-select" style="margin:0;" onchange="updateFantasyBudget()"></select>
-        </div>
-        <div style="margin-bottom:12px;">
-          <label style="font-size:11px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">ПИЛОТ 2</label>
-          <select id="fantasyDriver2" class="prediction-select" style="margin:0;" onchange="updateFantasyBudget()"></select>
-        </div>
-        <div style="margin-bottom:16px;">
-          <label style="font-size:11px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">ШАССИ (КОМАНДА)</label>
-          <select id="fantasyConstructor" class="prediction-select" style="margin:0;" onchange="updateFantasyBudget()"></select>
-        </div>
-
-
-        <button class="btn-action" onclick="saveFantasyTeam()">💾 СОХРАНИТЬ СОСТАВ</button>
-
-        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);">
-          <h4 style="margin:0 0 10px 0; font-size:16px; font-weight:900;">💼 Экономика Босса</h4>
-          <div style="display:flex; flex-direction:column; gap:8px;">
-             <button class="btn-action" style="background:var(--card-sub);" onclick="buyUpgrade('base', 500)">🏭 Прокачка базы (-500 🪙)</button>
-             <button class="btn-action" style="background:var(--card-sub);" onclick="buyUpgrade('scout', 200)">🔍 Скаутинг пилотов F2 (-200 🪙)</button>
-             <button class="btn-action" style="background:var(--card-sub);" onclick="buyUpgrade('livery', 1000)">🎨 Ретро-ливрея для гаража (-1000 🪙)</button>
-             <button class="btn-action" style="background:var(--card-sub);" onclick="buyUpgrade('insider', 100)">📈 Инсайдерская аналитика (-100 🪙)</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Вкладка: Квизы -->
-    <div id="games-tab-quiz" style="display:none;">
-      <div class="game-card" id="quizCardBox">
-        <h3 style="margin:0 0 10px 0; font-size:18px; font-weight:900;">❓ Ежедневный F1 Квиз</h3>
-        <div style="font-size:13px; color:var(--text-muted); margin-bottom:16px;" id="quizQuestionText">Загрузка вопроса...</div>
-        <div style="display:flex; flex-direction:column; gap:8px;" id="quizOptionsBox"></div>
-      </div>
-    </div>
-
   </div>
 
   <!-- ДЕТАЛИЗАЦИЯ КАТАЛОГА -->
@@ -856,7 +758,7 @@
         </label>
       </div>
       <div id="admImgPreviewBox" style="display:none; margin-bottom:12px;">
-        <img id="admImgPreviewEl" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="width:100%; max-height:140px; object-fit:cover; border-radius:10px;" alt="preview">
+        <img id="admImgPreviewEl" src="" style="width:100%; max-height:140px; object-fit:cover; border-radius:10px;">
       </div>
 
       <textarea class="search-input" id="admFormDesc" rows="2" placeholder="Описание заезда..."></textarea>
@@ -864,17 +766,6 @@
       <input class="search-input" id="admFormBadge" value="1080p">
       <input class="search-input" id="admFormCode" placeholder="Код выдачи (bahrain26_race)">
       <input type="number" class="search-input" id="admFormPostId" placeholder="ID поста на канале-складе">
-
-      <div class="setting-item" style="border:none; padding: 4px 0 16px 0;">
-        <div>
-          <div class="set-lbl">Сделать рассылку в Telegram</div>
-          <div class="set-sub" style="font-size:11px;">Уведомить подписчиков бота о новом контенте</div>
-        </div>
-        <label class="switch-toggle">
-          <input type="checkbox" id="admFormNotifyUser">
-          <span class="switch-slider"></span>
-        </label>
-      </div>
 
       <button class="btn-action" id="adminSubmitRecordBtn" onclick="submitCatalogRecordForm()">💾 Сохранить запись</button>
       <button class="btn-action btn-secondary" id="adminCancelEditBtn" style="display:none; margin-top:8px;" onclick="cancelCatalogEditMode()">Отмена</button>
@@ -894,77 +785,7 @@
     </div>
   </div>
 
-  <!-- ================= 7. ЭКРАН: ГАРАЖ (3D) ================= -->
-  <div id="view-garage" class="view-screen">
-    <!-- ПРЕМИАЛЬНЫЙ 3D-ГАРАЖ -->
-    <div class="hero-card" style="padding: 0; position: relative; height: 320px; background: linear-gradient(180deg, #1f2330 0%, #0a0b10 100%);">
-      <div id="garage-3d-container" style="width:100%; height:100%;"></div>
-      <div style="position: absolute; top: 15px; left: 15px; font-size: 14px; font-weight: 800; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.8); z-index: 10; display:flex; align-items:center; gap:8px;">
-        <span style="display:inline-block; width:8px; height:8px; background:var(--accent); border-radius:50%; box-shadow:0 0 8px var(--accent);"></span>
-        МОЙ ГАРАЖ
-      </div>
-      <div style="position: absolute; bottom: 15px; right: 15px; text-align: right; z-index: 10;">
-        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted);">RANK</div>
-        <div style="font-size: 18px; font-weight: 900; color: var(--text);" id="garageUserRank">Картингист</div>
-      </div>
-    </div>
-
-    <!-- БЛОК ПРОФИЛЯ -->
-    <div class="hero-card">
-      <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
-        <div id="garageAvatar" style="width:54px; height:54px; border-radius:14px; background:var(--card-sub); border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:24px;">👤</div>
-        <div style="flex:1;">
-          <h3 style="margin:0; font-size:18px; font-weight:900;" id="garageUserName">Гонщик F1</h3>
-          <div style="font-size:12px; color:var(--text-muted); font-weight:700; display:flex; align-items:center; gap:4px; margin-top:4px;">
-            <span>Баланс:</span> <span style="color:#ffcc00; font-weight:900;" id="garageCoinBalance">0</span> 🪙
-          </div>
-        </div>
-      </div>
-
-      <div style="font-size:11px; font-weight:700; color:var(--text-muted); display:flex; justify-content:space-between; margin-bottom:6px;">
-        <span>Прогресс до Ф-3</span>
-        <span id="garageProgressText">0 / 100</span>
-      </div>
-      <div style="width:100%; height:8px; background:var(--card-sub); border-radius:4px; overflow:hidden;">
-        <div id="garageProgressBar" style="width:0%; height:100%; background:var(--accent); transition:width 0.5s ease;"></div>
-      </div>
-
-      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin-top:16px; border-top:1px solid var(--border); padding-top:16px;">
-        <div style="text-align:center;">
-          <div style="font-size:20px; font-weight:900; color:var(--text);" id="statViews">0</div>
-          <div style="font-size:10px; color:var(--text-muted); font-weight:700;">ПРОСМОТРОВ</div>
-        </div>
-        <div style="text-align:center;">
-          <div style="font-size:20px; font-weight:900; color:var(--text);" id="statQuiz">0%</div>
-          <div style="font-size:10px; color:var(--text-muted); font-weight:700;">ПРАВИЛЬНО</div>
-        </div>
-        <div style="text-align:center;">
-          <div style="font-size:20px; font-weight:900; color:#ff8c00;" id="statStreak">0 🔥</div>
-          <div style="font-size:10px; color:var(--text-muted); font-weight:700;">STREAK</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- КОМНАТА ТРОФЕЕВ (АЧИВКИ) -->
-    <div class="hero-card">
-      <h3 style="margin:0 0 14px 0; font-size:16px; font-weight:900;">🏆 Комната трофеев</h3>
-      <div id="achievementsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(60px, 1fr)); gap:12px;">
-        <!-- Ачивки будут генерироваться через JS -->
-      </div>
-    </div>
-  </div>
-
-  <!-- АНИМИРОВАННЫЙ ТОСТ АЧИВОКИ -->
-  <div id="achievementToast" style="position:fixed; top:-100px; left:50%; transform:translateX(-50%); width:90%; max-width:400px; background:rgba(22, 24, 32, 0.95); backdrop-filter:blur(10px); border:1px solid var(--accent); border-radius:16px; padding:16px; display:flex; align-items:center; gap:16px; z-index:99999; transition:top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow:0 10px 30px rgba(255,0,0,0.2);">
-    <div id="toastIcon" style="width:40px; height:40px; border-radius:50%; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-size:20px;">🏆</div>
-    <div style="flex:1;">
-      <div style="font-size:11px; font-weight:800; color:var(--accent); text-transform:uppercase; letter-spacing:0.5px;">Достижение разблокировано!</div>
-      <div id="toastTitle" style="font-size:15px; font-weight:900; color:var(--text); margin-top:2px;">Название</div>
-    </div>
-    <div id="toastReward" style="font-size:16px; font-weight:900; color:#ffcc00;">+50 🪙</div>
-  </div>
-
-  <!-- НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ (5 ВКЛАДОК) -->
+  <!-- НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ (4 ВКЛАДКИ) -->
   <div class="bottom-nav">
     <div class="nav-btn active" onclick="switchMainTab('home', this)">
       <span class="nav-icon">🏠</span>
@@ -981,10 +802,6 @@
     <div class="nav-btn" onclick="switchMainTab('games', this)">
       <span class="nav-icon">🎮</span>
       <span>Игры</span>
-    </div>
-    <div class="nav-btn" onclick="switchMainTab('garage', this)">
-      <span class="nav-icon">🏎️</span>
-      <span>Гараж</span>
     </div>
   </div>
 
@@ -1064,27 +881,27 @@
   </div>
 
   <script>
-    const tg = window.Telegram && window.Telegram.WebApp;
+    const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
       tg.expand();
     }
 
-    const WORKER_URL = "https://flat-cell-8a39.ivan-petrovich378.workers.dev";
+    const WORKER_URL = "https://dark-art-1fac.poiuyuiop132.workers.dev";
     const BOT_USERNAME = "race_weekend_f1_bot";
     const ADMIN_ID = "301211351";
     const TESTER_ID = "8061233590";
 
     function resolveTelegramUser() {
       let uid = "";
-      if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user && tg.initDataUnsafe.user.id) uid = String(tg.initDataUnsafe.user.id);
-      if (!uid && tg && tg.initData) {
+      if (tg?.initDataUnsafe?.user?.id) uid = String(tg.initDataUnsafe.user.id);
+      if (!uid && tg?.initData) {
         try {
           const p = new URLSearchParams(tg.initData);
           const uStr = p.get('user');
           if (uStr) {
             const parsed = JSON.parse(decodeURIComponent(uStr));
-            if (parsed && parsed.id) uid = String(parsed.id);
+            if (parsed?.id) uid = String(parsed.id);
           }
         } catch (e) {}
       }
@@ -1102,20 +919,30 @@
     };
 
     let trackAnimInterval = null;
-    let pixiApp = null;
-    let pixiCar = null;
-    let pixiTrackLayer = null;
-
     function runCarAnimationOnTrack(circuitKey = "sepang", customPath = null) {
       const svgEl = document.getElementById('trackSvgEl');
-      const pixiContainer = document.getElementById('pixi-track-container');
-      if (!svgEl || !pixiContainer) return;
+      if (!svgEl) return;
+
+      let groupEl = document.getElementById('trackGroup');
+      if (!groupEl) {
+        groupEl = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        groupEl.id = "trackGroup";
+        while (svgEl.firstChild) {
+          groupEl.appendChild(svgEl.firstChild);
+        }
+        svgEl.appendChild(groupEl);
+      }
 
       const pathEl = document.getElementById('trackPath');
-      if (!pathEl) return;
+      const carDot = document.getElementById('carPoint');
+      const racingLine = document.getElementById('trackLine');
+      if (!pathEl || !carDot) return;
 
       const pathData = customPath || CIRCUITS_SVG_DATABASE[circuitKey] || CIRCUITS_SVG_DATABASE["sepang"];
       pathEl.setAttribute('d', pathData);
+      if (racingLine) racingLine.setAttribute('d', pathData);
+
+      groupEl.removeAttribute('transform');
 
       let bbox = { x: 0, y: 0, width: 400, height: 200 };
       try { 
@@ -1128,114 +955,28 @@
         bbox = { x: -400, y: -400, width: 800, height: 800 };
       }
 
-      const targetW = pixiContainer.clientWidth || 320;
-      const targetH = pixiContainer.clientHeight || 190;
-
-      // Initialize Pixi App only once
-      if (!pixiApp) {
-        pixiApp = new PIXI.Application({
-          width: targetW,
-          height: targetH,
-          backgroundAlpha: 0,
-          resolution: window.devicePixelRatio || 1,
-          antialias: true
-        });
-        pixiContainer.appendChild(pixiApp.view);
-
-        pixiTrackLayer = new PIXI.Container();
-        pixiApp.stage.addChild(pixiTrackLayer);
-
-        // Create a simple car sprite
-        pixiCar = new PIXI.Graphics();
-        pixiCar.beginFill(0xff0000);
-        pixiCar.drawRect(-8, -4, 16, 8); // Rectangle representing the car
-        pixiCar.endFill();
-        pixiTrackLayer.addChild(pixiCar);
-      } else {
-        // Clear previous track drawings if re-initializing
-        // Remove old track line graphics
-        for (let i = pixiTrackLayer.children.length - 1; i >= 0; i--) {
-            if (pixiTrackLayer.children[i] !== pixiCar) {
-                pixiTrackLayer.removeChild(pixiTrackLayer.children[i]);
-            }
-        }
-      }
-
+      const targetW = 400;
+      const targetH = 170;
+      
       const scaleX = targetW / bbox.width;
       const scaleY = targetH / bbox.height;
-      const scale = Math.min(scaleX, scaleY) * 0.8; // Give it some margin
+      const scale = Math.min(scaleX, scaleY);
 
       const cx = bbox.x + bbox.width / 2;
       const cy = bbox.y + bbox.height / 2;
+      const tx = 250 - cx * scale;
+      const ty = 125 - cy * scale;
 
-      // Draw the track in Pixi based on path points
+      groupEl.setAttribute('transform', `translate(${tx}, ${ty}) scale(${scale})`);
+
       let pathLength = 1000;
       try { pathLength = pathEl.getTotalLength(); } catch (e) {}
-
-      const gravelGfx = new PIXI.Graphics();
-      gravelGfx.lineStyle(16, 0x11131a, 1, 0.5, true); // Dark gravel/run-off border
-
-      const kerbGfx = new PIXI.Graphics();
-      kerbGfx.lineStyle(10, 0xff0000, 0.8, 0.5, true); // Red kerb accent under asphalt
-
-      const trackGfx = new PIXI.Graphics();
-      trackGfx.lineStyle(8, 0x1f2330, 1, 0.5, true); // Track asphalt
-
-      const racingLineGfx = new PIXI.Graphics();
-      racingLineGfx.lineStyle(2, 0xffffff, 0.5, 0.5, true); // Racing line
-
-      const step = 5;
-      for (let i = 0; i <= pathLength; i += step) {
-        try {
-          const pt = pathEl.getPointAtLength(i);
-          const px = (pt.x - cx) * scale;
-          const py = (pt.y - cy) * scale;
-          if (i === 0) {
-            gravelGfx.moveTo(px, py);
-            kerbGfx.moveTo(px, py);
-            trackGfx.moveTo(px, py);
-            racingLineGfx.moveTo(px, py);
-          } else {
-            gravelGfx.lineTo(px, py);
-
-            // Dashed kerb effect logic
-            if (Math.floor(i / 15) % 2 === 0) {
-                kerbGfx.lineStyle(10, 0xffffff, 0.8, 0.5, true);
-            } else {
-                kerbGfx.lineStyle(10, 0xff0000, 0.8, 0.5, true);
-            }
-            kerbGfx.lineTo(px, py);
-
-            trackGfx.lineTo(px, py);
-            racingLineGfx.lineTo(px, py);
-          }
-        } catch(e){}
-      }
-      // close the loop
-      try {
-        const startPt = pathEl.getPointAtLength(0);
-        const px = (startPt.x - cx) * scale;
-        const py = (startPt.y - cy) * scale;
-        gravelGfx.lineTo(px, py);
-        kerbGfx.lineTo(px, py);
-        trackGfx.lineTo(px, py);
-        racingLineGfx.lineTo(px, py);
-      } catch(e){}
-
-      pixiTrackLayer.addChildAt(gravelGfx, 0);
-      pixiTrackLayer.addChildAt(kerbGfx, 1);
-      pixiTrackLayer.addChildAt(trackGfx, 2);
-      pixiTrackLayer.addChildAt(racingLineGfx, 3);
-
 
       let currentDistance = 0;
       if (trackAnimInterval) clearInterval(trackAnimInterval);
 
       const REVERSED_TRACKS = ['catalunya', 'yas_marina']; 
       const isReversed = REVERSED_TRACKS.includes(circuitKey);
-
-      // Center the stage on the canvas
-      pixiApp.stage.position.set(targetW / 2, targetH / 2);
 
       trackAnimInterval = setInterval(() => {
         if (document.body.classList.contains('lite-mode')) return;
@@ -1248,28 +989,10 @@
 
         try {
           const coords = pathEl.getPointAtLength(currentDistance);
-
-          // Get next point for rotation
-          let nextDistance = isReversed ? (currentDistance - 1 + pathLength) % pathLength : (currentDistance + 1) % pathLength;
-          const nextCoords = pathEl.getPointAtLength(nextDistance);
-
-          const angle = Math.atan2(nextCoords.y - coords.y, nextCoords.x - coords.x);
-
-          const px = (coords.x - cx) * scale;
-          const py = (coords.y - cy) * scale;
-
-          pixiCar.position.set(px, py);
-          pixiCar.rotation = angle;
-
-          // Camera follow logic (moves the track layer slightly in opposite direction)
-          // To make it cinematic, we pivot the stage around the car, and add slight rotation
-          pixiApp.stage.pivot.x = px * 0.3;
-          pixiApp.stage.pivot.y = py * 0.3;
-          // Slowly rotate camera slightly based on car direction
-          pixiApp.stage.rotation = -angle * 0.15;
-
+          carDot.setAttribute('cx', coords.x);
+          carDot.setAttribute('cy', coords.y);
         } catch (e) {}
-      }, 16); // roughly 60fps
+      }, 35);
     }
     
     async function loadCircuitFromDatabase(circuitKey) {
@@ -1310,20 +1033,20 @@
           return new Date(`${dateStr}T${cleanTime}Z`);
         };
 
-        const isSprintWeekend = !!(raceData.Sprint && raceData.Sprint.date || raceData.SprintQualifying && raceData.SprintQualifying.date);
+        const isSprintWeekend = !!(raceData.Sprint?.date || raceData.SprintQualifying?.date);
 
         if (isSprintWeekend) {
-          if (raceData.FirstPractice && raceData.FirstPractice.date) sessions.push({ name: "Практика 1", short: "П1", date: parseLocalDateTime(raceData.FirstPractice.date, raceData.FirstPractice.time), duration: 60 });
+          if (raceData.FirstPractice?.date) sessions.push({ name: "Практика 1", short: "П1", date: parseLocalDateTime(raceData.FirstPractice.date, raceData.FirstPractice.time), duration: 60 });
           const sqData = raceData.SprintQualifying || raceData.Qualifying; 
-          if (sqData && sqData.date) sessions.push({ name: "Квалификация к спринту", short: "КВАЛА С", date: parseLocalDateTime(sqData.date, sqData.time), duration: 45 });
-          if (raceData.Sprint && raceData.Sprint.date) sessions.push({ name: "Спринт", short: "СПРИНТ", date: parseLocalDateTime(raceData.Sprint.date, raceData.Sprint.time), duration: 60 });
-          if (raceData.Qualifying && raceData.Qualifying.date) sessions.push({ name: "Квалификация к гонке", short: "КВАЛА", date: parseLocalDateTime(raceData.Qualifying.date, raceData.Qualifying.time), duration: 60 });
+          if (sqData?.date) sessions.push({ name: "Квалификация к спринту", short: "КВАЛА С", date: parseLocalDateTime(sqData.date, sqData.time), duration: 45 });
+          if (raceData.Sprint?.date) sessions.push({ name: "Спринт", short: "СПРИНТ", date: parseLocalDateTime(raceData.Sprint.date, raceData.Sprint.time), duration: 60 });
+          if (raceData.Qualifying?.date) sessions.push({ name: "Квалификация к гонке", short: "КВАЛА", date: parseLocalDateTime(raceData.Qualifying.date, raceData.Qualifying.time), duration: 60 });
           if (raceData.date) sessions.push({ name: "Гонка", short: "ГОНКА", date: parseLocalDateTime(raceData.date, raceData.time), duration: 120 });
         } else {
-          if (raceData.FirstPractice && raceData.FirstPractice.date) sessions.push({ name: "Практика 1", short: "П1", date: parseLocalDateTime(raceData.FirstPractice.date, raceData.FirstPractice.time), duration: 60 });
-          if (raceData.SecondPractice && raceData.SecondPractice.date) sessions.push({ name: "Практика 2", short: "П2", date: parseLocalDateTime(raceData.SecondPractice.date, raceData.SecondPractice.time), duration: 60 });
-          if (raceData.ThirdPractice && raceData.ThirdPractice.date) sessions.push({ name: "Практика 3", short: "П3", date: parseLocalDateTime(raceData.ThirdPractice.date, raceData.ThirdPractice.time), duration: 60 });
-          if (raceData.Qualifying && raceData.Qualifying.date) sessions.push({ name: "Квалификация", short: "КВАЛА", date: parseLocalDateTime(raceData.Qualifying.date, raceData.Qualifying.time), duration: 60 });
+          if (raceData.FirstPractice?.date) sessions.push({ name: "Практика 1", short: "П1", date: parseLocalDateTime(raceData.FirstPractice.date, raceData.FirstPractice.time), duration: 60 });
+          if (raceData.SecondPractice?.date) sessions.push({ name: "Практика 2", short: "П2", date: parseLocalDateTime(raceData.SecondPractice.date, raceData.SecondPractice.time), duration: 60 });
+          if (raceData.ThirdPractice?.date) sessions.push({ name: "Практика 3", short: "П3", date: parseLocalDateTime(raceData.ThirdPractice.date, raceData.ThirdPractice.time), duration: 60 });
+          if (raceData.Qualifying?.date) sessions.push({ name: "Квалификация", short: "КВАЛА", date: parseLocalDateTime(raceData.Qualifying.date, raceData.Qualifying.time), duration: 60 });
           if (raceData.date) sessions.push({ name: "Гонка", short: "ГОНКА", date: parseLocalDateTime(raceData.date, raceData.time), duration: 120 });
         }
       }
@@ -1434,7 +1157,7 @@
         w.classList.add('done');
         w.innerText = '✅';
         wheelsDone++;
-        if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
 
         if (wheelsDone === 4) {
           pitstopActive = false;
@@ -1442,7 +1165,7 @@
           const resEl = document.getElementById('pitstopTimerDisplay');
           resEl.innerText = `🏁 ПИТ-СТОП: ${totalSec} сек!`;
           resEl.style.color = totalSec < 2.3 ? '#28a745' : 'var(--accent)';
-          if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+          if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
       }
     }
@@ -1479,7 +1202,7 @@
       }
 
       const currentRound = window.activeRaceRound || "17"; 
-      const tgUser = tg && tg.initDataUnsafe && tg.initDataUnsafe.user || {};
+      const tgUser = tg?.initDataUnsafe?.user || {};
 
       try {
         const res = await fetch(`${WORKER_URL}/api/prediction/submit`, {
@@ -1502,7 +1225,7 @@
           const resBox = document.getElementById('predictionResultBox');
           resBox.style.display = 'block';
           resBox.innerText = `✅ Прогноз успешно принят сервером: ${chosen}`;
-          if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+          if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
           loadPredictionLeaderboard();
         } else {
           alert("Ошибка соединения. Попробуйте еще раз!");
@@ -1652,7 +1375,7 @@
 
     let brandClickCount = 0;
     let brandClickTimer = null;
-    var topBrandLogo = document.getElementById('topBrandLogo'); if(topBrandLogo) topBrandLogo.addEventListener('click', () => {
+    document.getElementById('topBrandLogo')?.addEventListener('click', () => {
       brandClickCount++;
       clearTimeout(brandClickTimer);
       brandClickTimer = setTimeout(() => { brandClickCount = 0; }, 1000);
@@ -1666,141 +1389,8 @@
       }
     });
 
-    let isGarageInitialized = false;
-    let threeScene, threeCamera, threeRenderer, garageModel;
-
-    function initGarage3D() {
-      if (isGarageInitialized || !window.THREE) return;
-
-      const container = document.getElementById('garage-3d-container');
-      if (!container) return;
-
-      isGarageInitialized = true;
-
-      // 1. Scene
-      threeScene = new THREE.Scene();
-
-      // 2. Camera
-      const width = container.clientWidth || 300;
-      const height = container.clientHeight || 350;
-      threeCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-      threeCamera.position.set(4, 2, 5);
-      threeCamera.lookAt(0, 0.5, 0);
-
-      // 3. Renderer (with premium settings)
-      threeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      threeRenderer.setSize(width, height);
-      threeRenderer.setPixelRatio(window.devicePixelRatio || 1);
-      // Tone mapping for realistic PBR
-      threeRenderer.toneMapping = THREE.ACESFilmicToneMapping;
-      threeRenderer.toneMappingExposure = 1.2;
-      container.appendChild(threeRenderer.domElement);
-
-      // 4. Premium Lighting
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-      threeScene.add(ambientLight);
-
-      const mainLight = new THREE.DirectionalLight(0xffffff, 2.5);
-      mainLight.position.set(5, 10, 7);
-      threeScene.add(mainLight);
-
-      // Neon rim lights for styling
-      const redLight = new THREE.PointLight(0xff0000, 50, 10);
-      redLight.position.set(-3, 1, -3);
-      threeScene.add(redLight);
-
-      const blueLight = new THREE.PointLight(0x0088ff, 50, 10);
-      blueLight.position.set(3, 1, 3);
-      threeScene.add(blueLight);
-
-      // 5. GLTF F1 Car Loading (Draco Compression)
-      garageModel = new THREE.Group();
-      threeScene.add(garageModel);
-
-      threeRenderer.shadowMap.enabled = true;
-      threeRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-      mainLight.castShadow = true;
-      mainLight.shadow.mapSize.width = 1024;
-      mainLight.shadow.mapSize.height = 1024;
-
-      const loader = new THREE.GLTFLoader();
-      const dracoLoader = new THREE.DRACOLoader();
-      dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
-      loader.setDRACOLoader(dracoLoader);
-
-      loader.load(
-          '/public/models/f1_car.glb',
-          function (gltf) {
-              const car = gltf.scene;
-              car.scale.set(0.5, 0.5, 0.5);
-              car.position.set(0, 0, 0);
-
-              // Enable shadows and PBR tweaks
-              car.traverse((node) => {
-                  if (node.isMesh) {
-                      node.castShadow = true;
-                      node.receiveShadow = true;
-                      if (node.material) {
-                          node.material.envMapIntensity = 1.2;
-                          node.material.needsUpdate = true;
-                      }
-                  }
-              });
-
-              garageModel.add(car);
-          },
-          undefined,
-          function (error) {
-              console.error('Error loading F1 model:', error);
-          }
-      );
-
-      // Add a premium glowing grid helper
-      const grid = new THREE.GridHelper(20, 40, 0xff0000, 0x1f2330);
-      grid.position.y = 0.01;
-      grid.material.opacity = 0.4;
-      grid.material.transparent = true;
-      threeScene.add(grid);
-
-      // OrbitControls for manual rotation
-      const controls = new THREE.OrbitControls(threeCamera, threeRenderer.domElement);
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.05;
-      controls.enableZoom = false;
-      controls.enablePan = false;
-      controls.autoRotate = true;
-      controls.autoRotateSpeed = 2.0;
-
-      // 6. Animation Loop
-      function animate() {
-        requestAnimationFrame(animate);
-        controls.update(); // Required if damping or autoRotate is enabled
-        threeRenderer.render(threeScene, threeCamera);
-      }
-      animate();
-
-      // Add simple touch/drag rotation support
-      let isDragging = false;
-      let previousMousePosition = { x: 0, y: 0 };
-
-      container.addEventListener('pointerdown', (e) => {
-        isDragging = true;
-        previousMousePosition = { x: e.offsetX, y: e.offsetY };
-      });
-      container.addEventListener('pointermove', (e) => {
-        if (!isDragging || !garageModel) return;
-        const deltaMove = { x: e.offsetX - previousMousePosition.x, y: e.offsetY - previousMousePosition.y };
-        garageModel.rotation.y += deltaMove.x * 0.01;
-        garageModel.rotation.x += deltaMove.y * 0.01;
-        previousMousePosition = { x: e.offsetX, y: e.offsetY };
-      });
-      container.addEventListener('pointerup', () => isDragging = false);
-      container.addEventListener('pointerleave', () => isDragging = false);
-    }
-
     function switchMainTab(tabName, btnEl) {
-      if (tg && tg.HapticFeedback) tg.HapticFeedback.selectionChanged();
+      if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
       document.querySelectorAll('.bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
       if (btnEl) btnEl.classList.add('active');
 
@@ -1812,184 +1402,6 @@
       if (tabName === 'season') {
         setTimeout(scrollToCurrentCalendarStage, 250);
       }
-
-      if (tabName === 'garage') {
-        setTimeout(initGarage3D, 50);
-        loadUserStatsFromD1();
-      }
-
-      if (tabName === 'games') {
-        switchGamesTab('predict');
-      }
-    }
-
-    function switchGamesTab(tab) {
-      document.getElementById('games-tab-predict').style.display = 'none';
-      document.getElementById('games-tab-fantasy').style.display = 'none';
-      document.getElementById('games-tab-quiz').style.display = 'none';
-      document.getElementById('games-tab-' + tab).style.display = 'block';
-
-      if (tab === 'fantasy') loadFantasyTeam();
-      if (tab === 'quiz') fetchQuiz();
-    }
-
-    let currentQuizData = null;
-
-    async function fetchQuiz() {
-      try {
-        const res = await fetch(`${WORKER_URL}/api/quiz`);
-        const data = await res.json();
-
-        if (data && data.question) {
-           currentQuizData = data;
-           document.getElementById('quizQuestionText').innerText = data.question;
-
-           let optionsHtml = '';
-           const options = JSON.parse(data.options || '[]');
-           options.forEach((opt, idx) => {
-               const safeOpt = opt.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-               optionsHtml += `<button class="btn-action" style="background:var(--card-sub); border:1px solid var(--border); text-align:left; justify-content:flex-start;" onclick="submitQuizAnswer('${opt.replace(/'/g, "\\'").replace(/"/g, "&quot;")}')">${safeOpt}</button>`;
-           });
-           document.getElementById('quizOptionsBox').innerHTML = optionsHtml;
-        } else {
-           document.getElementById('quizQuestionText').innerText = 'На сегодня квизов больше нет!';
-           document.getElementById('quizOptionsBox').innerHTML = '';
-        }
-      } catch (e) {
-        document.getElementById('quizQuestionText').innerText = 'Ошибка при загрузке квиза.';
-      }
-    }
-
-    async function submitQuizAnswer(selectedOption) {
-      if (!currentQuizData) return;
-
-      try {
-         const res = await fetch(`${WORKER_URL}/api/quiz/answer`, {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ userId: currentUserId, questionId: currentQuizData.id, answer: selectedOption })
-         });
-         const data = await res.json();
-
-         if (data.correct) {
-             alert('Правильно! +10 🪙');
-             if (window.userCoins !== undefined) {
-                 userCoins += 10;
-                 if (document.getElementById('garageCoinBalance')) {
-                     document.getElementById('garageCoinBalance').innerText = userCoins;
-                 }
-                 syncUserStatsToD1();
-             }
-             fetchQuiz(); // Load next
-         } else {
-             alert('Неправильно. Попробуй еще раз!');
-         }
-      } catch (e) {
-         alert('Ошибка сети.');
-      }
-    }
-
-    const FANTASY_DRIVERS = [
-        { id: 'VER', name: 'Max Verstappen', price: 30.0 },
-        { id: 'NOR', name: 'Lando Norris', price: 25.0 },
-        { id: 'LEC', name: 'Charles Leclerc', price: 22.0 },
-        { id: 'PIA', name: 'Oscar Piastri', price: 20.0 },
-        { id: 'SAI', name: 'Carlos Sainz', price: 18.0 }
-    ];
-
-    const FANTASY_CONSTRUCTORS = [
-        { id: 'RBR', name: 'Red Bull Racing', price: 35.0 },
-        { id: 'MCL', name: 'McLaren', price: 30.0 },
-        { id: 'FER', name: 'Ferrari', price: 28.0 },
-        { id: 'MER', name: 'Mercedes', price: 25.0 }
-    ];
-
-    async function loadFantasyTeam() {
-        const d1 = document.getElementById('fantasyDriver1');
-        const d2 = document.getElementById('fantasyDriver2');
-        const c1 = document.getElementById('fantasyConstructor');
-
-        if (d1.options.length === 0) {
-            d1.innerHTML = '<option value="">Выбрать пилота...</option>' + FANTASY_DRIVERS.map(d => `<option value="${d.id}">${d.name} ($${d.price}M)</option>`).join('');
-            d2.innerHTML = '<option value="">Выбрать пилота...</option>' + FANTASY_DRIVERS.map(d => `<option value="${d.id}">${d.name} ($${d.price}M)</option>`).join('');
-            c1.innerHTML = '<option value="">Выбрать шасси...</option>' + FANTASY_CONSTRUCTORS.map(c => `<option value="${c.id}">${c.name} ($${c.price}M)</option>`).join('');
-        }
-
-        try {
-            const res = await fetch(`${WORKER_URL}/api/fantasy/team?userId=${currentUserId}`);
-            const data = await res.json();
-            if (data && data.driver1) d1.value = data.driver1;
-            if (data && data.driver2) d2.value = data.driver2;
-            if (data && data.constructor) c1.value = data.constructor;
-            updateFantasyBudget();
-        } catch(e) {}
-    }
-
-    function updateFantasyBudget() {
-        let budget = 100.0;
-        const d1 = document.getElementById('fantasyDriver1').value;
-        const d2 = document.getElementById('fantasyDriver2').value;
-        const c1 = document.getElementById('fantasyConstructor').value;
-
-        const dr1 = FANTASY_DRIVERS.find(d => d.id === d1);
-        const dr2 = FANTASY_DRIVERS.find(d => d.id === d2);
-        const cr1 = FANTASY_CONSTRUCTORS.find(c => c.id === c1);
-
-        if (dr1) budget -= dr1.price;
-        if (dr2) budget -= dr2.price;
-        if (cr1) budget -= cr1.price;
-
-        const display = document.getElementById('fantasyBudgetDisplay');
-        display.innerText = `$${budget.toFixed(1)}M`;
-        if (budget < 0) {
-            display.style.color = 'var(--accent)';
-        } else {
-            display.style.color = '#00d95a';
-        }
-    }
-
-    async function saveFantasyTeam() {
-        const d1 = document.getElementById('fantasyDriver1').value;
-        const d2 = document.getElementById('fantasyDriver2').value;
-        const c1 = document.getElementById('fantasyConstructor').value;
-        const budgetText = document.getElementById('fantasyBudgetDisplay').innerText;
-
-        if (budgetText.startsWith('$-')) {
-            alert('Превышен лимит бюджета ($100M)!');
-            return;
-        }
-
-        try {
-            await fetch(`${WORKER_URL}/api/fantasy/team`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId: currentUserId,
-                    driver1: d1,
-                    driver2: d2,
-                    constructor: c1
-                })
-            });
-            alert('Состав команды сохранен!');
-        } catch(e) {
-            alert('Ошибка при сохранении команды.');
-        }
-    }
-
-    function buyUpgrade(type, cost) {
-        if (window.userCoins !== undefined && window.userCoins >= cost) {
-            window.userCoins -= cost;
-            if (document.getElementById('garageCoinBalance')) {
-                document.getElementById('garageCoinBalance').innerText = window.userCoins;
-            }
-            syncUserStatsToD1();
-            alert('Улучшение успешно куплено!');
-            if (type === 'livery') {
-                alert('Ретро-ливрея теперь доступна в гараже!');
-            }
-        } else {
-            alert('Недостаточно монет (🪙)!');
-        }
     }
 
     function openViewScreen(screenName) {
@@ -2281,9 +1693,9 @@
         b.className = 'menu-btn';
         b.innerHTML = `<span>${it.item}</span><span class="badge">${it.badge || '1080p'}</span>`;
         b.onclick = () => {
-          if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-          tg && tg.openTelegramLink && tg.openTelegramLink(`https://t.me/${BOT_USERNAME}?start=${it.code}`);
-          tg && tg.close && tg.close();
+          if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+          tg?.openTelegramLink(`https://t.me/${BOT_USERNAME}?start=${it.code}`);
+          tg?.close();
         };
         btnsBox.appendChild(b);
       });
@@ -2318,8 +1730,8 @@
         b.className = 'menu-btn';
         b.innerHTML = `<span>${e.title} — ${e.item}</span><span class="badge">${e.badge || '1080p'}</span>`;
         b.onclick = () => {
-          tg && tg.openTelegramLink && tg.openTelegramLink(`https://t.me/${BOT_USERNAME}?start=${e.code}`);
-          tg && tg.close && tg.close();
+          tg?.openTelegramLink(`https://t.me/${BOT_USERNAME}?start=${e.code}`);
+          tg?.close();
         };
         res.appendChild(b);
       });
@@ -2486,7 +1898,6 @@
       document.getElementById('admFormBadge').value = '1080p';
       document.getElementById('admFormCode').value = '';
       document.getElementById('admFormPostId').value = '';
-      document.getElementById('admFormNotifyUser').checked = false;
       document.getElementById('admImgPreviewBox').style.display = 'none';
 
       document.getElementById('adminFormHeaderTitle').innerText = '➕ Добавить запись в базу D1';
@@ -2505,7 +1916,6 @@
         badge: document.getElementById('admFormBadge').value,
         code: document.getElementById('admFormCode').value,
         post_id: document.getElementById('admFormPostId').value,
-        notify_users: document.getElementById('admFormNotifyUser').checked
       };
 
       if (!payload.category || !payload.title || !payload.item || !payload.code || !payload.post_id) {
@@ -2547,146 +1957,7 @@
       } catch (err) {}
     }
 
-    const ACHIEVEMENTS_DB = [
-      { id: 'first_drive', title: 'Первый выезд', desc: 'Открыл мини-апп', icon: '🏁', reward: 10 },
-      { id: 'night_mech', title: 'Ночной механик', desc: 'Зашел с 03:00 до 05:00', icon: '🦉', reward: 50 },
-      { id: 'monaco_prophet', title: 'Пророк Монако', desc: 'Угадал победителя в Монако', icon: '👑', reward: 100 },
-      { id: 'marathon', title: 'Марафонец', desc: 'Посмотрел 10 видео', icon: '🍿', reward: 75 },
-      { id: 'pole_pos', title: 'Поул-позиция', desc: 'Зашел за 5 мин до гонки', icon: '⏱️', reward: 50 },
-      { id: 'pit_crash', title: 'Авария на пит-лейне', desc: 'Провален Pit-Stop Challenge', icon: '💥', reward: 5 },
-      { id: 'archivist', title: 'Архивариус', desc: 'Открыл сезон 1990+', icon: '📼', reward: 30 },
-      { id: 'wall_of_champs', title: 'Стена чемпионов', desc: 'Нашел секрет', icon: '🧱', reward: 200 },
-      { id: 'quiz_king', title: 'Король прогнозов', desc: '5 верных квизов подряд', icon: '🧠', reward: 150 },
-      { id: 'fanatic', title: 'Фанатичная преданность', desc: 'Стрик 7 дней', icon: '🔥', reward: 300 }
-    ];
-
-    let userUnlockedAchievements = [];
-    let userCoins = 0;
-
-    async function loadUserStatsFromD1() {
-        try {
-            const res = await fetch(`${WORKER_URL}/api/user/stats?userId=${currentUserId}`);
-            const data = await res.json();
-            if (data && data.coins !== undefined) {
-                userCoins = data.coins || 0;
-                userUnlockedAchievements = data.achievements ? JSON.parse(data.achievements) : [];
-                if(document.getElementById('garageCoinBalance')) {
-                    document.getElementById('garageCoinBalance').innerText = userCoins;
-                    renderTrophyRoom();
-                    updateCareerRank();
-                }
-            }
-        } catch(e) {}
-    }
-
-    async function syncUserStatsToD1() {
-        try {
-            await fetch(`${WORKER_URL}/api/user/stats`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: currentUserId, coins: userCoins, achievements: JSON.stringify(userUnlockedAchievements) })
-            });
-        } catch(e) {}
-    }
-
-    function renderTrophyRoom() {
-      const grid = document.getElementById('achievementsGrid');
-      if (!grid) return;
-      grid.innerHTML = ACHIEVEMENTS_DB.map(a => {
-        const isUnlocked = userUnlockedAchievements.includes(a.id);
-        const onClickAction = isUnlocked ? "" : `onclick="showAchievementTooltip('${a.desc}')"`;
-        return `
-          <div class="achievement" ${onClickAction} style="text-align:center; opacity: ${isUnlocked ? '1' : '0.4'}; filter: ${isUnlocked ? 'none' : 'grayscale(1)'}; cursor: ${isUnlocked ? 'default' : 'pointer'}; position:relative;">
-            <div style="width:100%; aspect-ratio:1; border-radius:16px; background:var(--card-sub); border:2px solid ${isUnlocked ? 'var(--accent)' : 'var(--border)'}; display:flex; align-items:center; justify-content:center; font-size:28px; margin-bottom:6px; box-shadow: ${isUnlocked ? '0 4px 12px rgba(255,0,0,0.15)' : 'none'};">
-              ${a.icon}
-            </div>
-            <div style="font-size:9px; font-weight:800; color:var(--text); line-height:1.2; word-break:break-word;">${a.title}</div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function showAchievementTooltip(desc) {
-      const toast = document.getElementById('achievementToast');
-      document.getElementById('toastIcon').innerText = '🔒';
-      document.getElementById('toastTitle').innerText = 'Заблокировано';
-      document.getElementById('toastReward').innerText = desc;
-      toast.style.top = '20px';
-      setTimeout(() => { toast.style.top = '-100px'; }, 3000);
-    }
-
-    function showAchievementToast(achievementId) {
-      const a = ACHIEVEMENTS_DB.find(x => x.id === achievementId);
-      if (!a || userUnlockedAchievements.includes(a.id)) return;
-
-      userUnlockedAchievements.push(a.id);
-      userCoins += a.reward;
-
-      // Update UI if in garage
-      if(document.getElementById('garageCoinBalance')) {
-          document.getElementById('garageCoinBalance').innerText = userCoins;
-          renderTrophyRoom();
-          updateCareerRank();
-      }
-
-      syncUserStatsToD1();
-
-      const toast = document.getElementById('achievementToast');
-      document.getElementById('toastIcon').innerText = a.icon;
-      document.getElementById('toastTitle').innerText = a.title;
-      document.getElementById('toastReward').innerText = `+${a.reward} 🪙`;
-
-      toast.style.top = '20px';
-      if (tg && tg.HapticFeedback && tg.HapticFeedback.notificationOccurred) tg.HapticFeedback.notificationOccurred('success');
-
-      setTimeout(() => {
-        toast.style.top = '-100px';
-      }, 4000);
-    }
-
-    function updateCareerRank() {
-        const ranks = [
-            { name: "Картингист", req: 0, next: 100, nextName: "Ф-3" },
-            { name: "Пилот Ф-3", req: 100, next: 300, nextName: "Ф-2" },
-            { name: "Пилот Ф-2", req: 300, next: 700, nextName: "Тест-пилот" },
-            { name: "Тест-пилот", req: 700, next: 1500, nextName: "Боевой пилот F1" },
-            { name: "Боевой пилот F1", req: 1500, next: 3000, nextName: "Победитель Гран-при" },
-            { name: "Победитель Гран-при", req: 3000, next: 5000, nextName: "Легенда" },
-            { name: "Легенда / Чемпион", req: 5000, next: 5000, nextName: "MAX" }
-        ];
-
-        let currentRank = ranks[0];
-        for(let i=0; i<ranks.length; i++) {
-            if (userCoins >= ranks[i].req) currentRank = ranks[i];
-        }
-
-        const rankEl = document.getElementById('garageUserRank');
-        if(rankEl) rankEl.innerText = currentRank.name;
-
-        let progressPercent = 100;
-        if(currentRank.next > currentRank.req) {
-             progressPercent = Math.min(100, ((userCoins - currentRank.req) / (currentRank.next - currentRank.req)) * 100);
-             const pText = document.getElementById('garageProgressText');
-             if(pText) pText.innerText = `${userCoins} / ${currentRank.next} (до ${currentRank.nextName})`;
-        } else {
-             const pText = document.getElementById('garageProgressText');
-             if(pText) pText.innerText = `Максимальный ранг!`;
-        }
-
-        const bar = document.getElementById('garageProgressBar');
-        if(bar) bar.style.width = `${progressPercent}%`;
-    }
-
-    // Mock initial unlock for demonstration
-    setTimeout(() => {
-        if(Math.random() > 0.5) showAchievementToast('first_drive');
-    }, 3000);
-
     async function initAppRouting() {
-      try {
-        await fetch(`${WORKER_URL}/api/init`);
-      } catch(e) {}
-
       try {
         initThemeAndPreferences();
         loadCatalogDatabase();
@@ -2731,7 +2002,7 @@
       } catch (e) {}
     }
 
-    var deployV2Btn = document.getElementById('deployV2Btn'); if(deployV2Btn) deployV2Btn.addEventListener('click', async () => {
+    document.getElementById('deployV2Btn')?.addEventListener('click', async () => {
       if (!confirm("Переключить версию для всех пользователей на V2?")) return;
       
       try {
@@ -2763,67 +2034,37 @@
 
       box.innerHTML = categories.map((cat, idx) => `
         <div style="display:flex; justify-content:space-between; align-items:center; background:var(--card-sub); padding:10px 14px; border-radius:12px; border:1px solid var(--border);">
-          <span style="font-size:14px; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 40%;">${cat}</span>
-          <div style="display:flex; gap:4px;">
-            <button class="icon-circle-btn" style="width:30px; height:30px; font-size:12px;" onclick="moveCategoryOrder(${idx}, 'top')" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>⏫</button>
-            <button class="icon-circle-btn" style="width:30px; height:30px; font-size:12px;" onclick="moveCategoryOrder(${idx}, 'up')" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>⬆️</button>
-            <button class="icon-circle-btn" style="width:30px; height:30px; font-size:12px;" onclick="moveCategoryOrder(${idx}, 'down')" ${idx === categories.length - 1 ? 'disabled style="opacity:0.3"' : ''}>⬇️</button>
-            <button class="icon-circle-btn" style="width:30px; height:30px; font-size:12px;" onclick="moveCategoryOrder(${idx}, 'bottom')" ${idx === categories.length - 1 ? 'disabled style="opacity:0.3"' : ''}>⏬</button>
+          <span style="font-size:14px; font-weight:800;">${cat}</span>
+          <div style="display:flex; gap:6px;">
+            <button class="icon-circle-btn" style="width:32px; height:32px; font-size:13px;" onclick="moveCategoryOrder(${idx}, -1)" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>⬆️</button>
+            <button class="icon-circle-btn" style="width:32px; height:32px; font-size:13px;" onclick="moveCategoryOrder(${idx}, 1)" ${idx === categories.length - 1 ? 'disabled style="opacity:0.3"' : ''}>⬇️</button>
           </div>
         </div>
       `).join('');
     }
 
-    async function moveCategoryOrder(index, action) {
+    async function moveCategoryOrder(index, direction) {
       const categories = [...new Set(allCatalogItems.map(i => i.category))];
-      const cat = categories[index];
+      const targetIndex = index + direction;
       
-      if (action === 'up' && index > 0) {
-        categories[index] = categories[index - 1];
-        categories[index - 1] = cat;
-      } else if (action === 'down' && index < categories.length - 1) {
-        categories[index] = categories[index + 1];
-        categories[index + 1] = cat;
-      } else if (action === 'top' && index > 0) {
-        categories.splice(index, 1);
-        categories.unshift(cat);
-      } else if (action === 'bottom' && index < categories.length - 1) {
-        categories.splice(index, 1);
-        categories.push(cat);
-      } else {
-        return; // No valid move
-      }
+      if (targetIndex < 0 || targetIndex >= categories.length) return;
 
-      // New backend API payload structure based on the prompt
-      // Prompt mentioned: "endpoint (например, POST /api/admin/reorder), принимающий id элемента, действие ('top', 'up', 'down', 'bottom') и категорию."
-      // Let's send the full mapped order and also action/category to be safe
-      const payloadCategories = categories.map((c, order) => ({ category: c, order }));
+      const temp = categories[index];
+      categories[index] = categories[targetIndex];
+      categories[targetIndex] = temp;
+
+      const payloadCategories = categories.map((cat, order) => ({ category: cat, order }));
 
       try {
-        const res = await fetch(`${WORKER_URL}/api/admin/reorder`, {
+        const res = await fetch(`${WORKER_URL}/api/catalog/reorder`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
-          body: JSON.stringify({
-             action: action,
-             category: cat,
-             // Keeping categories array in payload as a fallback depending on how worker is strictly implemented
-             categories: payloadCategories
-          })
+          body: JSON.stringify({ categories: payloadCategories })
         });
         const data = await res.json();
-        if (data && data.success) {
+        if (data.success) {
           loadCatalogDatabase();
-          // Assuming we rely on D1 response being fast enough, else we re-render locally immediately
           renderAdminCategoriesOrder();
-        } else {
-            // Fallback if /api/admin/reorder doesn't exist, hit the old one
-            await fetch(`${WORKER_URL}/api/catalog/reorder`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
-                body: JSON.stringify({ categories: payloadCategories })
-            });
-            loadCatalogDatabase();
-            renderAdminCategoriesOrder();
         }
       } catch (e) {
         alert("Ошибка при сохранении порядка категорий");
@@ -2835,7 +2076,7 @@
     let f1Timeout = null;
     let f1Interval = null;
 
-    var f1LightsBtn = document.getElementById('f1LightsBtn'); if(f1LightsBtn) f1LightsBtn.addEventListener('click', () => {
+    document.getElementById('f1LightsBtn')?.addEventListener('click', () => {
       const btn = document.getElementById('f1LightsBtn');
       const lights = document.querySelectorAll('.f1-light');
       const resultDiv = document.getElementById('f1LightsResult');
