@@ -750,6 +750,90 @@
       border: 1px solid rgba(255,255,255,0.1);
       display: none;
     }
+
+    /* --- СТИЛИ ЭКРАНА "ГАРАЖ" И АЧИВОК --- */
+    .garage-profile-card {
+      background: linear-gradient(135deg, rgba(255, 59, 48, 0.15), var(--card-bg));
+      border: 1px solid rgba(255, 59, 48, 0.3);
+      border-radius: 24px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    .garage-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--card-sub);
+      border: 2px solid var(--accent);
+      object-fit: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--accent);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .garage-user-info h3 { margin: 0 0 4px 0; font-size: 18px; font-weight: 900; color: var(--text); }
+    .garage-user-info p { margin: 0; font-size: 12px; color: var(--text-muted); font-weight: 700; }
+    
+    .garage-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .garage-stat-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      text-align: center;
+    }
+    .garage-stat-val { font-size: 20px; font-weight: 900; color: var(--text); margin-top: 4px; }
+    .garage-stat-lbl { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .achievement-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      opacity: 0.5;
+      transition: all 0.25s ease;
+    }
+    .achievement-card.unlocked {
+      opacity: 1;
+      border-color: #34c759;
+      background: linear-gradient(135deg, rgba(52, 199, 89, 0.1), var(--card-bg));
+      box-shadow: 0 0 15px rgba(52, 199, 89, 0.25);
+    }
+    .achievement-icon { font-size: 24px; }
+    .achievement-title { font-size: 13px; font-weight: 800; color: var(--text); }
+    .achievement-desc { font-size: 11px; color: var(--text-muted); line-height: 1.3; }
+    .achievement-status {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-top: auto;
+      padding-top: 6px;
+      color: var(--text-muted);
+    }
+    .achievement-card.unlocked .achievement-status { color: #34c759; }
   </style>
   <style id="ai-live-patch-style"></style>
 </head>
@@ -858,7 +942,7 @@
     <!-- Подвкладки Игр -->
     <div class="games-subtabs-nav" id="gamesSubtabsNav">
       <button class="games-subtab-btn active" onclick="switchGamesSubTab('pred', this)">🏎️ Предикшн</button>
-      <button class="games-subtab-btn" onclick="switchGamesSubTab('lights', this)">🚦 Стартовые огни</button>
+      <button class="games-subtab-btn" onclick="switchGamesSubTab('lights', this)">🚦 Огни</button>
       <button class="games-subtab-btn" onclick="switchGamesSubTab('pitstop', this)">🔧 Пит-стоп</button>
     </div>
 
@@ -990,6 +1074,44 @@
     </div>
   </div>
 
+  <!-- ================= ЭКРАН: ГАРАЖ (ПРОФИЛЬ И АЧИВКИ) ================= -->
+  <div id="view-garage" class="view-screen">
+    <div class="garage-profile-card">
+      <div class="garage-avatar" id="garageAvatarEl">🏎️</div>
+      <div class="garage-user-info">
+        <h3 id="garageUserName">Пилот F1</h3>
+        <p id="garageUserHandle">@username • ID: —</p>
+      </div>
+    </div>
+
+    <div class="garage-stats-grid">
+      <div class="garage-stat-box">
+        <div class="garage-stat-lbl">Очки предикшна</div>
+        <div class="garage-stat-val" id="garageStatPts">0 PTS</div>
+      </div>
+      <div class="garage-stat-box">
+        <div class="garage-stat-lbl">Рекорд реакции</div>
+        <div class="garage-stat-val" id="garageStatReaction">— ms</div>
+      </div>
+      <div class="garage-stat-box">
+        <div class="garage-stat-lbl">Рекорд пит-стопа</div>
+        <div class="garage-stat-val" id="garageStatPit">— s</div>
+      </div>
+      <div class="garage-stat-box">
+        <div class="garage-stat-lbl">Прогнозов сделано</div>
+        <div class="garage-stat-val" id="garageStatVotes">0</div>
+      </div>
+    </div>
+
+    <div class="hero-card" style="padding: 18px;">
+      <h3 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 900;">🏆 Достижения гонщика</h3>
+      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">Выполняйте реальные действия в приложении и открывайте трофеи:</div>
+      <div class="achievements-grid" id="garageAchievementsGrid">
+        <!-- Динамически заполняется скриптом -->
+      </div>
+    </div>
+  </div>
+
   <!-- ДЕТАЛИЗАЦИЯ КАТАЛОГА -->
   <div id="view-titles" class="view-screen">
     <button class="icon-circle-btn" style="width:auto; padding:0 14px; border-radius:12px; margin-bottom:14px; font-size:13px; font-weight:800;" onclick="navigateBackFromTitles()">← Назад к категориям</button>
@@ -1110,6 +1232,10 @@
     <div class="nav-btn" onclick="switchMainTab('games', this)">
       <span class="nav-icon">🎮</span>
       <span>Игры</span>
+    </div>
+    <div class="nav-btn" onclick="switchMainTab('garage', this)">
+      <span class="nav-icon">🏎️</span>
+      <span>Гараж</span>
     </div>
   </div>
 
@@ -1348,6 +1474,7 @@
       clearTimeout(simTapTimer);
       simTapTimer = setTimeout(() => { simTapCounter = 0; }, 1200);
       if (simTapCounter >= 5) {
+        localStorage.setItem('f1_achievement_admin_sim', 'true');
         const simCard = document.getElementById('adminSimPanelCard');
         if (simCard) {
           simCard.style.display = simCard.style.display === 'none' ? 'flex' : 'none';
@@ -1613,6 +1740,7 @@
 
       } else if (lightsGameState.status === 'countdown') {
         // Фальстарт — сбрасываем все таймеры и сразу переводим в 'idle', чтобы следующий клик сразу запускал новую игру
+        localStorage.setItem('f1_achievement_false_start', 'true');
         clearAllLightsTimers();
         resetLightBulbs();
         lightsGameState.status = 'idle';
@@ -1643,6 +1771,10 @@
           if (bestBadge) bestBadge.innerText = `Рекорд: ${reaction} ms`;
         }
         if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+      }
+      if (reaction < 210) {
+        let streak = parseInt(localStorage.getItem('f1_fast_reactions_streak') || '0') + 1;
+        localStorage.setItem('f1_fast_reactions_streak', streak);
       }
     }
 
@@ -2070,6 +2202,187 @@
       if (tabName === 'season') {
         setTimeout(scrollToCurrentCalendarStage, 250);
       }
+      
+      if (tabName === 'garage') {
+        renderGarageProfileData();
+      }
+    }
+
+    // =========================================================================
+    // ЛОГИКА ЭКРАНА "ГАРАЖ" (ПРОФИЛЬ, СТАТИСТИКА, ТЕХНИЧЕСКИЕ АЧИВКИ)
+    // =========================================================================
+    async function renderGarageProfileData() {
+      const tgUser = tg?.initDataUnsafe?.user || {};
+      
+      // Имя и юзернейм из Telegram
+      const nameEl = document.getElementById('garageUserName');
+      const handleEl = document.getElementById('garageUserHandle');
+      const avatarEl = document.getElementById('garageAvatarEl');
+
+      const realName = `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim() || "Пилот Формулы-1";
+      const realHandle = tgUser.username ? `@${tgUser.username}` : `ID: ${currentUserId}`;
+
+      if (nameEl) nameEl.innerText = realName;
+      if (handleEl) handleEl.innerText = `${realHandle} • Участник сезона`;
+
+      // Аватарка из Telegram, если доступна
+      if (tgUser.photo_url) {
+        avatarEl.innerHTML = `<img src="${tgUser.photo_url}" style="width:100%; height:100%; object-fit:cover;">`;
+      } else {
+        avatarEl.innerText = realName.charAt(0).toUpperCase();
+      }
+
+      // Подтягиваем статистику из базы/localStorage
+      let userPts = "0";
+      try {
+        const res = await fetch(`${WORKER_URL}/api/prediction/leaderboard`);
+        const data = await res.json();
+        const me = (data.leaderboard || []).find(r => String(r.user_id) === String(currentUserId));
+        if (me) userPts = me.total_points || "0";
+      } catch (e) {
+        userPts = localStorage.getItem('f1_user_pred_points') || "0";
+      }
+
+      document.getElementById('garageStatPts').innerText = `${userPts} PTS`;
+
+      const bestReaction = localStorage.getItem('f1_best_reaction_time');
+      document.getElementById('garageStatReaction').innerText = bestReaction ? `${bestReaction} ms` : '— ms';
+
+      const bestPit = localStorage.getItem('f1_best_pitstop_time'); // Сохраняется при идеальном пит-стопе
+      document.getElementById('garageStatPit').innerText = bestPit ? `${bestPit} s` : '— s';
+
+      // Считаем количество отправленных прогнозов
+      let votesCount = 0;
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(`f1_pred_v2_${currentUserId}`)) votesCount++;
+      }
+      document.getElementById('garageStatVotes').innerText = votesCount;
+
+      // Рендеринг реальных технически отслеживаемых ачивок
+      renderAchievementsList({
+        userPts: parseInt(userPts) || 0,
+        bestReaction: parseInt(bestReaction) || 9999,
+        bestPit: parseFloat(bestPit) || 99,
+        votesCount: votesCount,
+        isDarkTheme: document.body.classList.contains('dark-theme')
+      });
+    }
+
+    function renderAchievementsList(stats) {
+      const grid = document.getElementById('garageAchievementsGrid');
+      if (!grid) return;
+
+      // Получаем дополнительные данные для проверки сложных ачивок из localStorage
+      const userVotesHistory = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(`f1_pred_v2_${currentUserId}_r`)) {
+          try { userVotesHistory.push(JSON.parse(localStorage.getItem(key))); } catch(e) {}
+        }
+      }
+
+      // Проверка: ловил ли пользователь фальстарт в огнях
+      const hasFalseStart = localStorage.getItem('f1_achievement_false_start') === 'true';
+      // Проверка: открывал ли админскую панель симуляции
+      const foundAdminSim = localStorage.getItem('f1_achievement_admin_sim') === 'true';
+      // Проверка: заходил ли по прямой ссылке ?start=code
+      const usedDeepLink = localStorage.getItem('f1_achievement_deeplink') === 'true';
+      // Проверка: количество просмотров видео из архива
+      const archiveViewsCount = parseInt(localStorage.getItem('f1_archive_views_count') || '0');
+      // Проверка: ночной просмотр (00:00 - 05:00)
+      const hasNightView = localStorage.getItem('f1_achievement_night_view') === 'true';
+      // Проверка: фастстарт / идеальная реакция < 210мс подряд
+      const fastReactionCount = parseInt(localStorage.getItem('f1_fast_reactions_streak') || '0');
+
+      const achievementsDefs = [
+        {
+          id: 'first_vote',
+          icon: '📝',
+          title: 'Первая кровь',
+          desc: 'Сделайте свой самый первый прогноз на этап.',
+          unlocked: stats.votesCount >= 1
+        },
+        {
+          id: 'veteran_tribun',
+          icon: '🏛️',
+          title: 'Ветеран трибун',
+          desc: 'Примите участие в предикшнах на 10 этапах сезона.',
+          unlocked: stats.votesCount >= 10
+        },
+        {
+          id: 'max_reaction',
+          icon: '⚡',
+          title: 'Реакция Макса',
+          desc: 'Продемонстрируйте время реакции на стартовых огнях быстрее 200 мс.',
+          unlocked: stats.bestReaction < 200 && stats.bestReaction > 0
+        },
+        {
+          id: 'false_start',
+          icon: '🚨',
+          title: 'Фальстарт!',
+          desc: 'Поторопитесь и нажмите на кнопку старта до погашения огней.',
+          unlocked: hasFalseStart
+        },
+        {
+          id: 'ferrari_crew',
+          icon: '🔧',
+          title: 'Бригада Ferrari',
+          desc: 'Пройдите «Пит-стоп челлендж» быстрее чем за 2.2 секунды без штрафов.',
+          unlocked: stats.bestPit <= 2.2 && stats.bestPit > 0
+        },
+        {
+          id: 'iron_nerves',
+          icon: '🏎️',
+          title: 'Железные нервы',
+          desc: 'Покажите идеальную реакцию на светофоре (менее 210 мс) 5 раз.',
+          unlocked: fastReactionCount >= 5
+        },
+        {
+          id: 'cinemaniac',
+          icon: '🎬',
+          title: 'Киноман Формулы 1',
+          desc: 'Посмотрите 5 полных записей заездов из архива через бота.',
+          unlocked: archiveViewsCount >= 5
+        },
+        {
+          id: 'night_view',
+          icon: '🌙',
+          title: 'Ночной просмотр',
+          desc: 'Откройте запись заезда в ночное время (с 00:00 до 05:00).',
+          unlocked: hasNightView
+        },
+        {
+          id: 'treasure_hunter',
+          icon: '🗺️',
+          title: 'Искатель сокровищ',
+          desc: 'Откройте архивный этап по прямой ссылке-приглашению (?start=code).',
+          unlocked: usedDeepLink
+        },
+        {
+          id: 'secret_advisor',
+          icon: '🕵️‍♂️',
+          title: 'Тайный советник',
+          desc: 'Найдите секретную админскую панель симуляции (5 кликов по какому то месту).',
+          unlocked: foundAdminSim
+        },
+        {
+          id: 'night_watch',
+          icon: '🖤',
+          title: 'Ночной дозор',
+          desc: 'Измените тему оформления приложения на темную.',
+          unlocked: stats.isDarkTheme
+        }
+      ];
+
+      grid.innerHTML = achievementsDefs.map(ach => `
+        <div class="achievement-card ${ach.unlocked ? 'unlocked' : ''}">
+          <div class="achievement-icon">${ach.icon}</div>
+          <div class="achievement-title">${ach.title}</div>
+          <div class="achievement-desc">${ach.desc}</div>
+          <div class="achievement-status">${ach.unlocked ? '✓ Получено' : '🔒 Заблокировано'}</div>
+        </div>
+      `).join('');
     }
 
     function openViewScreen(screenName) {
@@ -2474,6 +2787,13 @@
         b.className = 'menu-btn';
         b.onclick = () => {
           if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+          let vCount = parseInt(localStorage.getItem('f1_archive_views_count') || '0') + 1;
+          localStorage.setItem('f1_archive_views_count', vCount);
+
+          const currentHour = new Date().getHours();
+          if (currentHour >= 0 && currentHour < 5) {
+            localStorage.setItem('f1_achievement_night_view', 'true');
+          }
           tg?.openTelegramLink(`https://t.me/${BOT_USERNAME}?start=${it.code}`);
           tg?.close();
         };
@@ -2791,6 +3111,10 @@
 
     async function initAppRouting() {
       try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('start') || window.location.hash.includes('start')) {
+          localStorage.setItem('f1_achievement_deeplink', 'true');
+        }
         initThemeAndPreferences();
         loadAndApplyAiPatches();
         loadCatalogDatabase();
