@@ -96,6 +96,8 @@
     .view-screen { display: none; }
     .view-screen.active { display: block; animation: viewIn 0.2s ease-out; }
     @keyframes viewIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes f1FadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulseWheel { 0% { opacity: 0.65; } 100% { opacity: 1; } }
 
     .hero-card {
       background: var(--card-bg);
@@ -311,67 +313,294 @@
     .cal-info h4 { margin: 0; font-size: 15px; font-weight: 800; color: var(--text); }
     .cal-info span { font-size: 12px; color: var(--text-muted); }
 
-    .game-card {
-      background: var(--card-bg);
-      border-radius: 24px;
-      padding: 22px;
+    /* ================= СТИЛИ ВКЛАДКИ ИГРЫ (SUB-TABS, ПРЕДИКШН V2, ОГНИ, ПИТ-СТОП) ================= */
+    .games-subtabs-nav {
+      display: flex;
+      gap: 8px;
+      padding: 4px 0 14px 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .games-subtab-btn {
+      flex: 1;
+      min-width: 95px;
+      padding: 11px 12px;
+      border-radius: 14px;
       border: 1px solid var(--border);
-      margin-bottom: 16px;
-      text-align: center;
-    }
-    .lights-row { display: flex; justify-content: center; gap: 12px; margin: 20px 0; }
-    .f1-light {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: #2a2c36;
-      border: 2px solid #111;
-      transition: background 0.1s;
-    }
-    .f1-light.on { background: #ff2200; box-shadow: 0 0 16px #ff2200; }
-    .reaction-tap-area {
-      background: var(--card-sub);
-      border: 2px dashed var(--border);
-      border-radius: 18px;
-      padding: 30px 10px;
-      font-size: 16px;
+      background: var(--card-bg);
+      color: var(--text-muted);
+      font-size: 13px;
       font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .games-subtab-btn.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+      box-shadow: 0 4px 14px rgba(255, 59, 48, 0.35);
+    }
+    .games-tab-content { display: none; }
+    .games-tab-content.active { display: block; animation: f1FadeIn 0.25s ease; }
+
+    .f1-pred-container { display: flex; flex-direction: column; gap: 16px; padding: 4px 0; }
+    .f1-pred-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .f1-badge-active {
+      background: rgba(52, 199, 89, 0.15);
+      color: #34c759;
+      border: 1px solid rgba(52, 199, 89, 0.3);
+    }
+    .f1-badge-settled {
+      background: rgba(255, 59, 48, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(255, 59, 48, 0.3);
+    }
+    .pred-score-card {
+      background: linear-gradient(135deg, rgba(255, 59, 48, 0.18), #14161e);
+      border: 1px solid rgba(255, 59, 48, 0.3);
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+    .pred-score-val {
+      font-size: 32px;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1;
+      margin-top: 4px;
+      text-shadow: 0 0 12px rgba(255, 59, 48, 0.5);
+    }
+    .pred-stage-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .pred-driver-select {
+      width: 100%;
+      background: var(--input-bg);
       color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+      transition: border-color 0.2s;
       cursor: pointer;
     }
-    .reaction-res { font-size: 26px; font-weight: 900; color: var(--accent); margin-top: 14px; }
-
-    .pitstop-box {
-      margin-top: 15px;
+    .pred-driver-select:focus { border-color: var(--accent); }
+    .pred-vote-btn {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
       display: flex;
+      align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(255, 59, 48, 0.3);
+      transition: transform 0.1s, opacity 0.2s;
     }
-    .wheel-btn {
-      width: 65px;
-      height: 65px;
+    .pred-vote-btn:active { transform: scale(0.98); }
+    .pred-vote-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
+    .pred-leaderboard-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .pred-leaderboard-list {
+      max-height: 260px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-right: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .pred-leaderboard-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      background: var(--card-sub);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 13px;
+    }
+    .pred-leaderboard-item.is-me {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+    .pred-rank-badge {
+      min-width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 12px;
+      color: var(--text);
+      background: var(--border);
+    }
+    .rank-1 { background: #ffd700; color: #000; }
+    .rank-2 { background: #c0c0c0; color: #000; }
+    .rank-3 { background: #cd7f32; color: #fff; }
+
+    /* Стили Стартовых Огней */
+    .lights-display-board {
+      background: #0e0e12;
+      border: 2px solid #23232c;
+      border-radius: 18px;
+      padding: 18px 12px;
+      display: flex;
+      justify-content: space-around;
+      margin: 8px 0;
+      box-shadow: inset 0 0 20px #000;
+    }
+    .light-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 10px 8px;
+      border-radius: 10px;
+    }
+    .light-bulb {
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       background: #222;
-      border: 3px solid #444;
+      border: 2px solid #111;
+      transition: background-color 0.05s, box-shadow 0.05s;
+    }
+    .light-bulb.lit {
+      background: #ff2a2a;
+      box-shadow: 0 0 14px #ff2a2a, 0 0 24px #ff0000;
+    }
+
+    /* Стили Пит-стопа */
+    .pit-car-arena {
+      position: relative;
+      width: 100%;
+      max-width: 320px;
+      height: 240px;
+      margin: 8px auto;
+      background: var(--card-sub);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pit-car-body {
+      width: 72px;
+      height: 162px;
+      background: var(--accent);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 14px;
       color: #fff;
-      font-size: 24px;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 15px rgba(255, 59, 48, 0.35);
+      transition: transform 0.35s ease, opacity 0.35s ease;
+    }
+    .pit-car-body.entering {
+      transform: translateY(35px) scale(0.92);
+      opacity: 0.55;
+    }
+    .pit-wheel-btn {
+      position: absolute;
+      width: 48px;
+      height: 58px;
+      border-radius: 10px;
+      background: #2a2a32;
+      border: 2px solid #3e3e4a;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .pit-wheel-btn.target-orange {
+      background: rgba(255, 149, 0, 0.45) !important;
+      border: 2px solid #ff9500 !important;
+      box-shadow: 0 0 16px rgba(255, 149, 0, 0.85) !important;
+      animation: pulseWheel 0.5s infinite alternate;
+    }
+    .pit-wheel-btn.done-green {
+      background: rgba(52, 199, 89, 0.85) !important;
+      border: 2px solid #34c759 !important;
+      box-shadow: 0 0 14px rgba(52, 199, 89, 0.9) !important;
+    }
+    .wheel-fl { top: 20px; left: 36px; }
+    .wheel-fr { top: 20px; right: 36px; }
+    .wheel-rl { bottom: 20px; left: 36px; }
+    .wheel-rr { bottom: 20px; right: 36px; }
+
+    /* Сортировка элементов в Архиве */
+    .archive-reorder-ctrls {
+      display: inline-flex;
+      gap: 5px;
+      margin-left: auto;
+      padding-left: 8px;
+      align-items: center;
+    }
+    .archive-reorder-btn {
+      background: var(--card-sub);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 28px;
+      height: 28px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-    }
-    .wheel-btn.done { border-color: #28a745; background: #1b3823; }
-
-    .prediction-select {
-      width: 100%;
-      background: var(--input-bg);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px 16px;
-      font-size: 15px;
       color: var(--text);
-      outline: none;
-      margin-bottom: 12px;
+      font-size: 12px;
+      transition: background 0.2s;
+    }
+    .archive-reorder-btn:active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
     }
 
     .search-input {
@@ -506,7 +735,6 @@
       border: 1px solid var(--border);
     }
 
-    /* Терминал ИИ-агента в админке */
     .ai-terminal-output {
       background: #111318;
       color: #00ff9d;
@@ -527,7 +755,7 @@
 </head>
 <body>
 
-  <!-- Контейнер для динамических HTML-блоков от ИИ-агента -->
+  <!-- Контейнер для дополнительных Live-патчей ИИ -->
   <div id="ai-live-patch-html"></div>
 
   <!-- ШАПКА -->
@@ -565,8 +793,8 @@
         </svg>
       </div>
 
-      <h2 class="gp-title" id="gpTitleDisplay">Гран-при Сингапура</h2>
-      <div class="gp-sub" id="gpSubDisplay">Этап 17 • Марина-Бей</div>
+      <h2 class="gp-title" id="gpTitleDisplay">Гран-при США</h2>
+      <div class="gp-sub" id="gpSubDisplay">Этап 18 • Остин</div>
 
       <div class="sessions-grid" id="weekendSessionsGrid">
         <div class="sess-chip"><div class="sess-name">-- • --</div><div class="sess-time">--:--</div></div>
@@ -611,7 +839,7 @@
     <div id="seasonSubStandings">
       <div class="leader-card">
         <div class="leader-bg-num">01</div>
-        <div class="leader-badge">Лидер сезона</div>
+        <div class="leader-badge">Лидер сезона 2026</div>
         <h3 class="leader-name" id="leaderNameDisplay">—</h3>
         <div class="leader-team" id="leaderTeamDisplay">—</div>
         <div class="leader-pts-row">
@@ -625,56 +853,155 @@
     <div id="seasonSubTeams" style="display: none;"><div id="constructorsStandingsList"></div></div>
   </div>
 
-  <!-- ================= 4. ЭКРАН: ИГРЫ F1 + ПРЕДИКШН ================= -->
+  <!-- ================= 4. ЭКРАН: ИГРЫ F1 (НОВАЯ СИСТЕМА SUB-TABS) ================= -->
   <div id="view-games" class="view-screen">
-    <div class="game-card" style="border: 2px solid var(--accent);">
-      <h3 style="margin:0 0 6px 0; font-size:18px; font-weight:900;">🏆 Предикшн на Гран-при</h3>
-      <div style="font-size:13px; color:var(--text-muted); line-height:1.4; margin-bottom:14px;">
-        Выберите победителя гонки (3 очка за 1 место, 2 за 2-е, 1 за 3-е). Прогноз можно сделать 1 раз!
-      </div>
-      <div id="predictionActiveBox">
-        <select id="predictionDriverSelect" class="prediction-select"><option value="">⏳ Загрузка пилотов...</option></select>
-        <button class="btn-action" onclick="submitUserPrediction()">Сделать прогноз</button>
-      </div>
-      <div id="predictionResultBox" style="display:none; font-size:14px; font-weight:700; color:var(--accent); margin-top:10px;"></div>
+    <!-- Подвкладки Игр -->
+    <div class="games-subtabs-nav" id="gamesSubtabsNav">
+      <button class="games-subtab-btn active" onclick="switchGamesSubTab('pred', this)">🏎️ Предикшн</button>
+      <button class="games-subtab-btn" onclick="switchGamesSubTab('lights', this)">🚦 Огни старта</button>
+      <button class="games-subtab-btn" onclick="switchGamesSubTab('pitstop', this)">🔧 Пит-стоп</button>
     </div>
 
-    <div class="game-card">
-      <h3 style="margin:0 0 10px 0; font-size:16px; font-weight:900;">📊 Таблица очков прогнозов</h3>
-      <div id="predictionLeaderboardList" style="text-align:left; font-size:13px; color:var(--text-muted);">Загрузка лидерборда...</div>
+    <!-- Подвкладка 1: Продвинутый Предикшн V2 -->
+    <div id="tab-content-pred" class="games-tab-content active">
+      <div class="f1-pred-container">
+        <!-- Карточка баланса игрока -->
+        <div class="pred-score-card">
+          <div>
+            <div style="font-size:11px; color:rgba(255,255,255,0.65); text-transform:uppercase; font-weight:800;">Ваш баланс очков</div>
+            <div class="pred-score-val"><span id="predUserPointsVal">0</span> <span style="font-size:14px; color:var(--accent); font-weight:800;">PTS</span></div>
+          </div>
+          <span class="f1-pred-badge f1-badge-active" id="predRoundBadge" onclick="handleSecretSimTap()">Раунд 18 / 23 • Сезон 2026</span>
+        </div>
+
+        <!-- Форма прогноза на актуальный этап -->
+        <div class="pred-stage-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:11px; color:var(--accent); font-weight:800; text-transform:uppercase;" id="predStageSubLabel">Актуальный этап</div>
+              <div style="font-size:18px; font-weight:900;" id="predStageTitleDisplay">Гран-при США</div>
+            </div>
+            <span class="f1-pred-badge f1-badge-active" id="predStatusBadge">Открыт</span>
+          </div>
+
+          <div>
+            <label style="font-size:12px; color:var(--text-muted); font-weight:700; display:block; margin-bottom:6px;">🏆 Победитель гонки (P1, +25 очков):</label>
+            <select id="pred-p1-select" class="pred-driver-select"></select>
+          </div>
+
+          <div>
+            <label style="font-size:12px; color:var(--text-muted); font-weight:700; display:block; margin-bottom:6px;">⚡ Быстрейший круг (FL, +10 очков):</label>
+            <select id="pred-fl-select" class="pred-driver-select"></select>
+          </div>
+
+          <div>
+            <label style="font-size:12px; color:var(--text-muted); font-weight:700; display:block; margin-bottom:6px;">🚨 Выезд Safety Car (+5 очков):</label>
+            <select id="pred-sc-select" class="pred-driver-select">
+              <option value="Да">Да, будет Safety Car</option>
+              <option value="Нет">Нет, чистая гонка</option>
+            </select>
+          </div>
+
+          <button id="pred-submit-btn" class="pred-vote-btn" onclick="submitUserPredictionV2()">
+            Отправить прогноз
+          </button>
+        </div>
+
+        <!-- Секретная панель симуляции финиша (СТРОГО ТОЛЬКО ДЛЯ АДМИНА) -->
+        <div id="adminSimPanelCard" class="pred-stage-card" style="display:none; border: 2px dashed var(--accent);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:14px; font-weight:900; color:var(--accent);">⚙️ Админ-симуляция финиша гонки</div>
+            <span class="badge">ADMIN ONLY</span>
+          </div>
+          <div style="font-size:12px; color:var(--text-muted);">
+            Выбери результаты этапа, чтобы автоматически рассчитать очки всем проголосовавшим в БД D1 и переключить раунд на следующий:
+          </div>
+          <div>
+            <label style="font-size:11px; font-weight:700; color:var(--text-muted);">Победитель (P1):</label>
+            <select id="sim-p1-select" class="pred-driver-select" style="margin-top:4px;"></select>
+          </div>
+          <div>
+            <label style="font-size:11px; font-weight:700; color:var(--text-muted);">Быстрейший круг (FL):</label>
+            <select id="sim-fl-select" class="pred-driver-select" style="margin-top:4px;"></select>
+          </div>
+          <div>
+            <label style="font-size:11px; font-weight:700; color:var(--text-muted);">Был ли Safety Car:</label>
+            <select id="sim-sc-select" class="pred-driver-select" style="margin-top:4px;">
+              <option value="Да">Да</option>
+              <option value="Нет">Нет</option>
+            </select>
+          </div>
+          <button class="pred-vote-btn" onclick="runAdminSettleStage()">🏁 Завершить этап и начислить очки</button>
+        </div>
+
+        <!-- Прокручиваемая таблица лидеров (Реальные игроки из БД) -->
+        <div class="pred-leaderboard-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:15px; font-weight:900;">🏁 Таблица лидеров сообщества</div>
+            <button class="icon-circle-btn" style="width:30px; height:30px; font-size:13px;" onclick="loadPredictionLeaderboard()">🔄</button>
+          </div>
+          <div id="predictionLeaderboardList" class="pred-leaderboard-list">
+            <div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">Загрузка рейтинга игроков...</div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="card game-card">
-      <h3>⚡ Реакция на стартовые огни F1</h3>
-      <p class="card-desc">Загораются 5 красных огней по очереди. Жди выключения и жми!</p>
-  
-      <div class="f1-lights-container" style="display: flex; gap: 10px; justify-content: center; margin: 15px 0;">
-        <div class="f1-light" style="width: 35px; height: 35px; border-radius: 50%; background: #2a2a35; transition: background 0.2s;"></div>
-        <div class="f1-light" style="width: 35px; height: 35px; border-radius: 50%; background: #2a2a35; transition: background 0.2s;"></div>
-        <div class="f1-light" style="width: 35px; height: 35px; border-radius: 50%; background: #2a2a35; transition: background 0.2s;"></div>
-        <div class="f1-light" style="width: 35px; height: 35px; border-radius: 50%; background: #2a2a35; transition: background 0.2s;"></div>
-        <div class="f1-light" style="width: 35px; height: 35px; border-radius: 50%; background: #2a2a35; transition: background 0.2s;"></div>
-      </div>
+    <!-- Подвкладка 2: Стартовые огни F1 (Без бага с фальстартом) -->
+    <div id="tab-content-lights" class="games-tab-content">
+      <div class="pred-stage-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:11px; color:var(--accent); font-weight:800; text-transform:uppercase;">Реакция гонщика</div>
+            <div style="font-size:18px; font-weight:900;">Стартовые огни F1</div>
+          </div>
+          <span id="lights-best-badge" class="f1-pred-badge f1-badge-active">Рекорд: --</span>
+        </div>
 
-      <button id="f1LightsBtn" class="action-btn" style="width: 100%; padding: 12px; background: #e10600; color: #fff; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;">
-        НАЖМИ ДЛЯ СТАРТА
-      </button>
-      <div id="f1LightsResult" style="text-align: center; margin-top: 10px; font-size: 14px; color: #aaa;"></div>
+        <div class="lights-display-board">
+          <div class="light-column"><div class="light-bulb" id="f1_bulb_1"></div></div>
+          <div class="light-column"><div class="light-bulb" id="f1_bulb_2"></div></div>
+          <div class="light-column"><div class="light-bulb" id="f1_bulb_3"></div></div>
+          <div class="light-column"><div class="light-bulb" id="f1_bulb_4"></div></div>
+          <div class="light-column"><div class="light-bulb" id="f1_bulb_5"></div></div>
+        </div>
+
+        <div id="lights-status-box" style="min-height:75px; border-radius:14px; background:var(--card-sub); border:1px solid var(--border); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:12px;">
+          <div id="lights-status-title" style="font-weight:900; font-size:16px;">Нажмите СТАРТ чтобы начать</div>
+          <div id="lights-status-sub" style="font-size:12px; color:var(--text-muted); margin-top:4px;">Ждите, пока погаснут все 5 красных огней</div>
+        </div>
+
+        <button id="lights-action-btn" class="pred-vote-btn" onclick="handleF1LightsAction()">СТАРТ</button>
+      </div>
     </div>
 
-    <div class="game-card">
-      <h3 style="margin:0 0 6px 0; font-size:18px; font-weight:900;">🏎💨 Pit-Stop Challenge</h3>
-      <div style="font-size:13px; color:var(--text-muted); line-height:1.4;">
-        Коснись всех 4 колёс болида как можно быстрее!
+    <!-- Подвкладка 3: Усложненный Пит-стоп Челлендж (0.7с задержка + подсветка колес) -->
+    <div id="tab-content-pitstop" class="games-tab-content">
+      <div class="pred-stage-card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:11px; color:var(--accent); font-weight:800; text-transform:uppercase;">Челлендж механиков</div>
+            <div style="font-size:18px; font-weight:900;">Быстрый пит-стоп</div>
+          </div>
+          <div id="pit-time-display" style="font-size:24px; font-weight:900; color:var(--text);">0.00s</div>
+        </div>
+
+        <div class="pit-car-arena">
+          <div id="pit-car" class="pit-car-body">F1</div>
+          <button class="pit-wheel-btn wheel-fl" data-pos="fl" onclick="handlePitWheelClick('fl', this)">FL</button>
+          <button class="pit-wheel-btn wheel-fr" data-pos="fr" onclick="handlePitWheelClick('fr', this)">FR</button>
+          <button class="pit-wheel-btn wheel-rl" data-pos="rl" onclick="handlePitWheelClick('rl', this)">RL</button>
+          <button class="pit-wheel-btn wheel-rr" data-pos="rr" onclick="handlePitWheelClick('rr', this)">RR</button>
+        </div>
+
+        <div id="pit-status-note" style="font-size:13px; text-align:center; color:var(--text-muted); min-height:20px; font-weight:700;">
+          Нажимайте поочередно на подсвеченные оранжевым колеса (промах +0.5с)
+        </div>
+
+        <button id="pit-start-btn" class="pred-vote-btn" onclick="startAdvancedPitstopGame()">
+          <span id="pit-start-btn-text">НАЧАТЬ ПИТ-СТОП</span>
+        </button>
       </div>
-      <div class="pitstop-box">
-        <div class="wheel-btn" id="w1" onclick="handleWheelTap(1)">🛞</div>
-        <div class="wheel-btn" id="w2" onclick="handleWheelTap(2)">🛞</div>
-        <div class="wheel-btn" id="w3" onclick="handleWheelTap(3)">🛞</div>
-        <div class="wheel-btn" id="w4" onclick="handleWheelTap(4)">🛞</div>
-      </div>
-      <div class="reaction-res" id="pitstopTimerDisplay" style="color:var(--text); font-size:22px;">2.00 сек</div>
-      <button class="btn-action" style="margin-top:10px;" onclick="resetPitstopGame()">НАЧАТЬ ПИТ-СТОП</button>
     </div>
   </div>
 
@@ -690,11 +1017,11 @@
     <div id="catalogItemButtonsList"></div>
   </div>
 
-  <!-- ================= 6. ПАНЕЛЬ АДМИНИСТРАТОРА ================= -->
+  <!-- ================= 6. ПАНЕЛЬ АДМИНИСТРАТОРА (БЕЗ УПРАВЛЕНИЯ ЭТАПОМ НА ГЛАВНОЙ) ================= -->
   <div id="view-admin" class="view-screen">
     <button class="icon-circle-btn" style="width:auto; padding:0 14px; border-radius:12px; margin-bottom:14px; font-size:13px; font-weight:800;" onclick="navigateBackFromAdmin()">← Выйти из админки</button>
 
-    <!-- НОВЫЙ БЛОК: ИИ-АГЕНТ РАЗРАБОТЧИК ПРЯМО В АДМИНКЕ -->
+    <!-- БЛОК ИИ-АГЕНТА РАЗРАБОТЧИКА -->
     <div class="hero-card" style="border: 2px solid var(--accent); background: linear-gradient(180deg, var(--card-bg) 0%, var(--card-sub) 100%);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
         <h3 style="margin:0; font-size:17px; font-weight:900;">🤖 ИИ-Агент Разработчик (Gemini)</h3>
@@ -709,7 +1036,7 @@
         <option value="consult">💻 Сгенерировать код / Фикс для Worker</option>
       </select>
 
-      <textarea id="aiAgentPromptInput" class="search-input" rows="3" placeholder="Например: Добавь на главный экран красивую кнопку перехода в наш Telegram-чат или перекрась активные вкладки в золотой..."></textarea>
+      <textarea id="aiAgentPromptInput" class="search-input" rows="3" placeholder="Например: Добавь анимацию при клике на карточки или новую фичу..."></textarea>
 
       <div style="display:flex; gap:8px;">
         <button class="btn-action" id="aiAgentRunBtn" style="margin-top:0; flex:2;" onclick="executeAdminAiAgent()">🚀 Выполнить задачу</button>
@@ -717,46 +1044,6 @@
       </div>
 
       <div id="aiAgentTerminalOutput" class="ai-terminal-output"></div>
-    </div>
-
-    <div class="hero-card" style="border-color: rgba(255,59,48,0.4);">
-      <h3 style="margin:0 0 6px 0; font-size:17px; font-weight:900;">🏎 Управление этапом на Главной</h3>
-      <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Выбери трассу и настройки:</div>
-
-      <label style="font-size:12px; font-weight:700; color:var(--text-muted);">Активная трасса:</label>
-      <select id="admActiveCircuitSelect" class="search-input" style="margin-top:4px;">
-        <option value="albert_park">01. Австралия — Мельбурн</option>
-        <option value="shanghai">02. Китай — Шанхай</option>
-        <option value="suzuka">03. Япония — Сузука</option>
-        <option value="bahrain">04. Бахрейн — Сахир</option>
-        <option value="jeddah">05. Саудовская Аравия — Джидда</option>
-        <option value="miami">06. Майами</option>
-        <option value="imola">07. Эмилия-Романья — Имола</option>
-        <option value="monaco">08. Монако</option>
-        <option value="catalunya">09. Испания — Барселона</option>
-        <option value="villeneuve">10. Канада — Монреаль</option>
-        <option value="red_bull_ring">11. Австрия — Шпильберг</option>
-        <option value="silverstone">12. Великобритания — Сильверстоун</option>
-        <option value="spa">13. Бельгия — Спа-Франкоршам</option>
-        <option value="hungaroring">14. Венгрия — Хунгароринг</option>
-        <option value="zandvoort">15. Нидерланды — Зандворт</option>
-        <option value="sepang">16. Малайзия — Сепанг</option>
-        <option value="marina_bay">17. Сингапур — Марина-Бей</option>
-        <option value="americas">18. США — Остин (COTA)</option>
-        <option value="rodriguez">19. Мексика — Мехико</option>
-        <option value="interlagos">20. Бразилия — Интерлагос</option>
-        <option value="vegas">21. Лас-Вегас</option>
-        <option value="losail">22. Катар — Лусаил</option>
-        <option value="yas_marina">23. Абу-Даби — Яс-Марина</option>
-      </select>
-
-      <label style="font-size:12px; font-weight:700; color:var(--text-muted);">Заголовок Гран-при:</label>
-      <input class="search-input" id="admActiveGpTitle" value="Гран-при Малайзии" style="margin-top:4px;">
-
-      <label style="font-size:12px; font-weight:700; color:var(--text-muted);">Подзаголовок:</label>
-      <input class="search-input" id="admActiveGpSub" value="Этап 16 • Сепанг • 5,543 км" style="margin-top:4px;">
-
-      <button class="btn-action" onclick="saveAdminCurrentWeekendConfig()">💾 Применить настройки этапа</button>
     </div>
 
     <div class="hero-card">
@@ -951,7 +1238,7 @@
     const isTester = (isAdmin || currentUserId === TESTER_ID);
 
     // =========================================================================
-    // ИИ-АГЕНТ: ЗАГРУЗКА И ИСПОЛНЕНИЕ LIVE-ПАТЧЕЙ
+    // ИИ-АГЕНТ: ЗАГРУЗКА И ИСПОЛНЕНИЕ ДОПОЛНИТЕЛЬНЫХ LIVE-ПАТЧЕЙ
     // =========================================================================
     function applyLivePatchToDom(patch) {
       if (!patch) return;
@@ -1017,7 +1304,7 @@
           termEl.innerText = `❌ Ошибка: ${data.error || "Неизвестная ошибка"}`;
         } else if (data.mode === "patch") {
           applyLivePatchToDom(data.patch);
-          termEl.innerText = `✅ LIVE-ПАТЧ УСПЕШНО ПРИМЕНЕН!\n\n🛠 Что сделано:\n${data.explanation}\n\n--- Сгенерированный код ---\n[CSS]: ${data.patch?.css ? "Обновлен" : "Без изменений"}\n[HTML]: ${data.patch?.html ? "Добавлен" : "Без изменений"}\n[JS]: ${data.patch?.js || "Нет"}`;
+          termEl.innerText = `✅ LIVE-ПАТЧ УСПЕШНО ПРИМЕНЕН!\n\n🛠 Что сделано:\n${data.explanation}`;
           promptEl.value = "";
           if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         } else {
@@ -1032,7 +1319,7 @@
     }
 
     async function resetAllAiLivePatches() {
-      if (!confirm("Сбросить все Live-патчи ИИ-агента и вернуть чистую верстку?")) return;
+      if (!confirm("Сбросить дополнительные Live-патчи ИИ-агента?")) return;
       try {
         const res = await fetch(`${WORKER_URL}/api/ai/reset_patch`, {
           method: 'POST',
@@ -1041,16 +1328,456 @@
         const data = await res.json();
         if (data.success) {
           applyLivePatchToDom({ css: "", html: "", js: "" });
-          const termEl = document.getElementById('aiAgentTerminalOutput');
-          termEl.style.display = "block";
-          termEl.innerText = "⏪ Все Live-патчи сброшены. Перезагрузка...";
-          setTimeout(() => location.reload(), 600);
+          location.reload();
         }
       } catch (e) {
         alert("Ошибка при сбросе патчей");
       }
     }
 
+    // =========================================================================
+    // ПЕРЕКЛЮЧЕНИЕ ПОДВКЛАДОК В РАЗДЕЛЕ "ИГРЫ"
+    // =========================================================================
+    function switchGamesSubTab(tabKey, btnEl) {
+      if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+      document.querySelectorAll('#gamesSubtabsNav .games-subtab-btn').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+
+      document.getElementById('tab-content-pred').classList.toggle('active', tabKey === 'pred');
+      document.getElementById('tab-content-lights').classList.toggle('active', tabKey === 'lights');
+      document.getElementById('tab-content-pitstop').classList.toggle('active', tabKey === 'pitstop');
+    }
+
+    // =========================================================================
+    // ИГРА 1: ПРОДВИНУТЫЙ ПРЕДИКШН V2 (СВЯЗАН С API ПИЛОТОВ И БД D1)
+    // =========================================================================
+    window.activeRaceRound = "18";
+    window.totalSeasonRounds = "23";
+    window.activeRaceName = "Гран-при США";
+
+    let simTapCounter = 0;
+    let simTapTimer = null;
+    function handleSecretSimTap() {
+      if (!isAdmin) return;
+      simTapCounter++;
+      clearTimeout(simTapTimer);
+      simTapTimer = setTimeout(() => { simTapCounter = 0; }, 1200);
+      if (simTapCounter >= 5) {
+        const simCard = document.getElementById('adminSimPanelCard');
+        if (simCard) {
+          simCard.style.display = simCard.style.display === 'none' ? 'flex' : 'none';
+        }
+      }
+    }
+
+    function initPredictionGame(driversList) {
+      const p1Select = document.getElementById('pred-p1-select');
+      const flSelect = document.getElementById('pred-fl-select');
+      const scSelect = document.getElementById('pred-sc-select');
+      const submitBtn = document.getElementById('pred-submit-btn');
+      const statusBadge = document.getElementById('predStatusBadge');
+      const roundBadge = document.getElementById('predRoundBadge');
+      const stageTitle = document.getElementById('predStageTitleDisplay');
+
+      if (!p1Select || !flSelect) return;
+
+      const currentRound = String(window.activeRaceRound || "18");
+      const totalRounds = String(window.totalSeasonRounds || "23");
+
+      if (roundBadge) roundBadge.innerText = `Раунд ${currentRound} / ${totalRounds} • Сезон 2026`;
+      if (stageTitle) stageTitle.innerText = window.activeRaceName || "Гран-при Формулы 1";
+
+      const optionsHtml = driversList.map(d => `<option value="${d.name}">${d.name} (${d.team})</option>`).join('');
+      p1Select.innerHTML = optionsHtml;
+      flSelect.innerHTML = optionsHtml;
+
+      const simP1 = document.getElementById('sim-p1-select');
+      const simFl = document.getElementById('sim-fl-select');
+      if (simP1) simP1.innerHTML = optionsHtml;
+      if (simFl) simFl.innerHTML = optionsHtml;
+
+      if (isAdmin) {
+        const simCard = document.getElementById('adminSimPanelCard');
+        if (simCard) simCard.style.display = 'flex';
+      }
+
+      const savedVoteRaw = localStorage.getItem(`f1_pred_v2_${currentUserId}_r${currentRound}`);
+      if (savedVoteRaw) {
+        try {
+          const v = JSON.parse(savedVoteRaw);
+          if (v.p1) p1Select.value = v.p1;
+          if (v.fl) flSelect.value = v.fl;
+          if (v.sc) scSelect.value = v.sc;
+        } catch (e) {}
+        p1Select.disabled = true;
+        flSelect.disabled = true;
+        scSelect.disabled = true;
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Прогноз успешно зафиксирован ✓";
+        statusBadge.className = "f1-pred-badge f1-badge-settled";
+        statusBadge.innerText = "Принят ✓";
+      } else {
+        p1Select.disabled = false;
+        flSelect.disabled = false;
+        scSelect.disabled = false;
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Отправить прогноз";
+        statusBadge.className = "f1-pred-badge f1-badge-active";
+        statusBadge.innerText = "Открыт";
+      }
+
+      loadPredictionLeaderboard();
+    }
+
+    async function submitUserPredictionV2() {
+      const p1 = document.getElementById('pred-p1-select').value;
+      const fl = document.getElementById('pred-fl-select').value;
+      const sc = document.getElementById('pred-sc-select').value;
+      const currentRound = String(window.activeRaceRound || "18");
+      const tgUser = tg?.initDataUnsafe?.user || {};
+
+      if (!p1) {
+        alert("Выберите победителя гонки!");
+        return;
+      }
+
+      const btn = document.getElementById('pred-submit-btn');
+      btn.disabled = true;
+      btn.innerText = "⏳ Сохранение в БД...";
+
+      try {
+        const res = await fetch(`${WORKER_URL}/api/prediction/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: currentUserId,
+            round: currentRound,
+            driver_name: p1,
+            fastest_lap: fl,
+            safety_car: sc,
+            first_name: tgUser.first_name || "",
+            last_name: tgUser.last_name || "",
+            username: tgUser.username || ""
+          })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          localStorage.setItem(`f1_pred_v2_${currentUserId}_r${currentRound}`, JSON.stringify({ p1, fl, sc, ts: Date.now() }));
+          document.getElementById('pred-p1-select').disabled = true;
+          document.getElementById('pred-fl-select').disabled = true;
+          document.getElementById('pred-sc-select').disabled = true;
+          btn.innerText = "Прогноз успешно зафиксирован ✓";
+
+          const statusBadge = document.getElementById('predStatusBadge');
+          statusBadge.className = "f1-pred-badge f1-badge-settled";
+          statusBadge.innerText = "Принят ✓";
+
+          if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+          loadPredictionLeaderboard();
+        } else {
+          btn.disabled = false;
+          btn.innerText = "Отправить прогноз";
+          alert("Ошибка сохранения: " + (data.error || "Попробуйте снова"));
+        }
+      } catch (e) {
+        btn.disabled = false;
+        btn.innerText = "Отправить прогноз";
+        alert("Ошибка сети при отправке прогноза.");
+      }
+    }
+
+    async function runAdminSettleStage() {
+      if (!isAdmin) return;
+      const currentRound = String(window.activeRaceRound || "18");
+      const p1 = document.getElementById('sim-p1-select').value;
+      const fl = document.getElementById('sim-fl-select').value;
+      const sc = document.getElementById('sim-sc-select').value;
+
+      if (!confirm(`Завершить Раунд ${currentRound} (Победитель: ${p1}) и начислить очки всем участникам в БД?`)) return;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/api/prediction/settle`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
+          body: JSON.stringify({ round: currentRound, p1, fl, sc })
+        });
+        const data = await res.json();
+        if (data.success) {
+          const nextRound = String(parseInt(currentRound) + 1);
+          window.activeRaceRound = nextRound;
+          alert(`✅ Очки начислены (обработано прогнозов: ${data.settledCount || 0})! Выполнен переход на Раунд ${nextRound}.`);
+          initPredictionGame(window.currentLoadedDrivers || DEFAULT_DRIVERS_DATA);
+        } else {
+          alert("Ошибка расчета: " + (data.error || ""));
+        }
+      } catch (e) {
+        alert("Ошибка сети при расчете этапа");
+      }
+    }
+
+    async function loadPredictionLeaderboard() {
+      const listEl = document.getElementById('predictionLeaderboardList');
+      const userPtsEl = document.getElementById('predUserPointsVal');
+      if (!listEl) return;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/api/prediction/leaderboard`);
+        const data = await res.json();
+        const rows = data.leaderboard || [];
+
+        const myRecord = rows.find(r => String(r.user_id) === String(currentUserId));
+        if (userPtsEl) {
+          userPtsEl.innerText = myRecord ? (myRecord.total_points || 0) : 0;
+        }
+
+        if (rows.length === 0) {
+          listEl.innerHTML = '<div style="text-align:center; padding:18px; color:var(--text-muted); font-size:13px;">Прогнозов пока нет. Сделайте первый прогноз на этап!</div>';
+          return;
+        }
+
+        listEl.innerHTML = rows.map((row, idx) => {
+          const isMe = String(row.user_id) === String(currentUserId);
+          let displayName = `${row.first_name || ''} ${row.last_name || ''}`.trim();
+          if (!displayName) {
+            displayName = row.username ? `@${row.username}` : `Пилот #${String(row.user_id).slice(-4)}`;
+          }
+          if (isMe) displayName += " (Вы)";
+
+          const rankClass = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : '';
+
+          return `
+            <div class="pred-leaderboard-item ${isMe ? 'is-me' : ''}">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div class="pred-rank-badge ${rankClass}">${idx + 1}</div>
+                <div style="font-weight:700;">${displayName}</div>
+              </div>
+              <div style="font-weight:900; color:var(--accent);">${row.total_points || 0} PTS</div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        listEl.innerHTML = '<div style="text-align:center; padding:18px; color:var(--text-muted);">Не удалось загрузить таблицу лидеров.</div>';
+      }
+    }
+
+    // =========================================================================
+    // ИГРА 2: СТАРТОВЫЕ ОГНИ F1 (ПОЛНЫЙ ФИКС БАГА С ФАЛЬСТАРТОМ)
+    // =========================================================================
+    let lightsGameState = { status: 'idle', startTime: 0, stepTimer: null, outTimer: null };
+
+    function initLightsBestRecord() {
+      const best = localStorage.getItem('f1_best_reaction_time');
+      const badge = document.getElementById('lights-best-badge');
+      if (best && badge) badge.innerText = `Рекорд: ${best} ms`;
+    }
+
+    function clearAllLightsTimers() {
+      if (lightsGameState.stepTimer) {
+        clearTimeout(lightsGameState.stepTimer);
+        lightsGameState.stepTimer = null;
+      }
+      if (lightsGameState.outTimer) {
+        clearTimeout(lightsGameState.outTimer);
+        lightsGameState.outTimer = null;
+      }
+    }
+
+    function resetLightBulbs() {
+      for (let i = 1; i <= 5; i++) {
+        const b = document.getElementById(`f1_bulb_${i}`);
+        if (b) b.classList.remove('lit');
+      }
+    }
+
+    function handleF1LightsAction() {
+      const btn = document.getElementById('lights-action-btn');
+      const stTitle = document.getElementById('lights-status-title');
+      const stSub = document.getElementById('lights-status-sub');
+      const bestBadge = document.getElementById('lights-best-badge');
+
+      if (lightsGameState.status === 'idle') {
+        clearAllLightsTimers();
+        resetLightBulbs();
+        lightsGameState.status = 'countdown';
+
+        btn.innerText = 'ЖДИТЕ ПОГАСАНИЯ...';
+        btn.style.background = '#222';
+        btn.style.color = '#fff';
+        stTitle.innerText = 'Огни загораются...';
+        stTitle.style.color = 'var(--text)';
+        stSub.innerText = 'Не нажимайте раньше времени!';
+
+        let count = 0;
+        function lightNextBulb() {
+          count++;
+          const bulb = document.getElementById(`f1_bulb_${count}`);
+          if (bulb) bulb.classList.add('lit');
+          if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+
+          if (count < 5) {
+            lightsGameState.stepTimer = setTimeout(lightNextBulb, 750);
+          } else {
+            const randomDelay = 900 + Math.random() * 2100;
+            lightsGameState.outTimer = setTimeout(() => {
+              resetLightBulbs();
+              lightsGameState.status = 'go';
+              lightsGameState.startTime = performance.now();
+              btn.innerText = 'ЖМИ СЕЙЧАС!';
+              btn.style.background = '#34c759';
+              btn.style.color = '#fff';
+              stTitle.innerText = '🟢 ГАЗ В ПОЛ!';
+              stTitle.style.color = '#34c759';
+              stSub.innerText = 'Нажмите как можно быстрее!';
+            }, randomDelay);
+          }
+        }
+        lightsGameState.stepTimer = setTimeout(lightNextBulb, 550);
+
+      } else if (lightsGameState.status === 'countdown') {
+        // Фальстарт — сбрасываем все таймеры и сразу переводим в 'idle', чтобы следующий клик сразу запускал новую игру
+        clearAllLightsTimers();
+        resetLightBulbs();
+        lightsGameState.status = 'idle';
+
+        btn.innerText = 'ПОПРОБОВАТЬ СНОВА';
+        btn.style.background = 'var(--accent)';
+        btn.style.color = '#fff';
+        stTitle.innerText = '🚨 ФАЛЬСТАРТ!';
+        stTitle.style.color = 'var(--accent)';
+        stSub.innerText = 'Вы нажали до того, как огни погасли. Нажмите кнопку для новой попытки!';
+        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+
+      } else if (lightsGameState.status === 'go') {
+        const reaction = Math.round(performance.now() - lightsGameState.startTime);
+        clearAllLightsTimers();
+        lightsGameState.status = 'idle';
+
+        btn.innerText = 'ИГРАТЬ ЕЩЕ РАЗ';
+        btn.style.background = 'var(--accent)';
+        btn.style.color = '#fff';
+        stTitle.innerText = `⚡ Ваша реакция: ${reaction} ms!`;
+        stTitle.style.color = '#34c759';
+        stSub.innerText = reaction < 230 ? 'Уровень пилота Формулы 1!' : 'Отличный старт! Нажмите для новой попытки.';
+
+        const oldBest = parseInt(localStorage.getItem('f1_best_reaction_time')) || 99999;
+        if (reaction < oldBest) {
+          localStorage.setItem('f1_best_reaction_time', reaction);
+          if (bestBadge) bestBadge.innerText = `Рекорд: ${reaction} ms`;
+        }
+        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+      }
+    }
+
+    // =========================================================================
+    // ИГРА 3: ПИТ-СТОП ЧЕЛЛЕНДЖ (ЗАДЕРЖКА 0.7С + ПОДСВЕТКА КОЛЕС + ШТРАФЫ)
+    // =========================================================================
+    let pitState = {
+      running: false,
+      step: 0,
+      order: ['fl', 'fr', 'rl', 'rr'],
+      currentTarget: null,
+      penalty: 0,
+      startTime: 0,
+      timerInterval: null,
+      nextWheelTimer: null
+    };
+
+    function resetPitWheelsUI() {
+      document.querySelectorAll('.pit-wheel-btn').forEach(w => {
+        const pos = w.getAttribute('data-pos');
+        w.className = `pit-wheel-btn wheel-${pos}`;
+      });
+    }
+
+    function highlightNextPitWheel() {
+      if (!pitState.running) return;
+      const timeDisp = document.getElementById('pit-time-display');
+      const note = document.getElementById('pit-status-note');
+      const startBtn = document.getElementById('pit-start-btn');
+      const startBtnText = document.getElementById('pit-start-btn-text');
+
+      if (pitState.step >= pitState.order.length) {
+        pitState.running = false;
+        clearInterval(pitState.timerInterval);
+        const total = ((performance.now() - pitState.startTime) / 1000 + pitState.penalty).toFixed(2);
+        timeDisp.innerText = `${total}s`;
+        timeDisp.style.color = '#34c759';
+        startBtn.style.display = 'flex';
+        startBtnText.innerText = 'ПОВТОРИТЬ ПИТ-СТОП';
+        note.innerHTML = `<span style="color:#34c759;">🏁 Пит-стоп завершен за ${total}s! (Штрафы: +${pitState.penalty.toFixed(1)}s)</span>`;
+        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+        return;
+      }
+
+      const nextPos = pitState.order[pitState.step];
+      pitState.currentTarget = nextPos;
+      const targetBtn = document.querySelector(`.pit-wheel-btn[data-pos="${nextPos}"]`);
+      if (targetBtn) targetBtn.classList.add('target-orange');
+    }
+
+    function startAdvancedPitstopGame() {
+      const timeDisp = document.getElementById('pit-time-display');
+      const note = document.getElementById('pit-status-note');
+      const startBtn = document.getElementById('pit-start-btn');
+      const carBody = document.getElementById('pit-car');
+
+      if (pitState.timerInterval) clearInterval(pitState.timerInterval);
+      if (pitState.nextWheelTimer) clearTimeout(pitState.nextWheelTimer);
+
+      pitState.running = false;
+      pitState.currentTarget = null;
+      startBtn.style.display = 'none';
+      resetPitWheelsUI();
+
+      timeDisp.style.color = 'var(--text)';
+      timeDisp.innerText = '0.00s';
+      carBody.classList.add('entering');
+      note.innerHTML = '<span style="color:#ff9500;">🏎️ Болид заезжает на пит-лейн... Приготовьте пальцы!</span>';
+
+      // Задержка 0.7 секунды перед стартом секундомера
+      setTimeout(() => {
+        carBody.classList.remove('entering');
+        note.innerText = '🔥 МЕНЯЙТЕ ПОДСВЕЧЕННЫЕ КОЛЕСА!';
+        pitState.running = true;
+        pitState.step = 0;
+        pitState.penalty = 0;
+        pitState.order = ['fl', 'fr', 'rl', 'rr'].sort(() => Math.random() - 0.5);
+        pitState.startTime = performance.now();
+
+        pitState.timerInterval = setInterval(() => {
+          const elapsed = (performance.now() - pitState.startTime) / 1000 + pitState.penalty;
+          timeDisp.innerText = `${elapsed.toFixed(2)}s`;
+        }, 30);
+
+        highlightNextPitWheel();
+      }, 700);
+    }
+
+    function handlePitWheelClick(pos, btnEl) {
+      if (!pitState.running) return;
+      const note = document.getElementById('pit-status-note');
+
+      if (pos === pitState.currentTarget) {
+        btnEl.classList.remove('target-orange');
+        btnEl.classList.add('done-green');
+        pitState.currentTarget = null;
+        pitState.step++;
+        if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+
+        // Короткая динамическая задержка (120-220 мс), чтобы все 4 колеса укладывались в ~2 секунды
+        const stepDelay = pitState.step >= 4 ? 50 : (120 + Math.random() * 100);
+        pitState.nextWheelTimer = setTimeout(highlightNextPitWheel, stepDelay);
+      } else if (!btnEl.classList.contains('done-green')) {
+        pitState.penalty += 0.5;
+        note.innerHTML = '<span style="color:var(--accent);">⚠️ ОШИБКА КОЛЕСА! +0.5 сек штрафа!</span>';
+        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('error');
+      }
+    }
+
+    // =========================================================================
+    // КАРТА И ТАЙМЕР ГЛАВНОГО ЭКРАНА
+    // =========================================================================
     const CIRCUITS_SVG_DATABASE = {
       "sepang": "M 80,155 L 390,155 Q 410,155 405,140 Q 400,125 380,135 L 260,175 Q 240,180 250,200 L 275,225 Q 295,245 320,225 L 350,195 Q 370,175 400,195 L 435,215 Q 460,225 450,180 L 415,100 Q 395,50 340,55 L 260,65 Q 235,70 240,95 L 250,125 Q 245,145 220,135 L 140,135 Q 75,135 60,170 Q 55,200 95,200 L 370,200 Q 400,200 400,175 Q 400,155 380,155 Z"
     };
@@ -1082,29 +1809,13 @@
       groupEl.removeAttribute('transform');
 
       let bbox = { x: 0, y: 0, width: 400, height: 200 };
-      try { 
-        bbox = pathEl.getBBox(); 
-      } catch (e) {
-        bbox = { x: -400, y: -400, width: 800, height: 800 };
-      }
+      try { bbox = pathEl.getBBox(); } catch (e) { bbox = { x: -400, y: -400, width: 800, height: 800 }; }
+      if (!bbox || !bbox.width || !bbox.height) bbox = { x: -400, y: -400, width: 800, height: 800 };
 
-      if (!bbox || !bbox.width || !bbox.height) {
-        bbox = { x: -400, y: -400, width: 800, height: 800 };
-      }
-
-      const targetW = 400;
-      const targetH = 170;
-      
-      const scaleX = targetW / bbox.width;
-      const scaleY = targetH / bbox.height;
-      const scale = Math.min(scaleX, scaleY);
-
+      const scale = Math.min(400 / bbox.width, 170 / bbox.height);
       const cx = bbox.x + bbox.width / 2;
       const cy = bbox.y + bbox.height / 2;
-      const tx = 250 - cx * scale;
-      const ty = 125 - cy * scale;
-
-      groupEl.setAttribute('transform', `translate(${tx}, ${ty}) scale(${scale})`);
+      groupEl.setAttribute('transform', `translate(${250 - cx * scale}, ${125 - cy * scale}) scale(${scale})`);
 
       let pathLength = 1000;
       try { pathLength = pathEl.getTotalLength(); } catch (e) {}
@@ -1112,18 +1823,10 @@
       let currentDistance = 0;
       if (trackAnimInterval) clearInterval(trackAnimInterval);
 
-      const REVERSED_TRACKS = ['catalunya', 'yas_marina']; 
-      const isReversed = REVERSED_TRACKS.includes(circuitKey);
-
+      const isReversed = ['catalunya', 'yas_marina'].includes(circuitKey);
       trackAnimInterval = setInterval(() => {
         if (document.body.classList.contains('lite-mode')) return;
-        
-        if (isReversed) {
-          currentDistance = (currentDistance - 2.5 + pathLength) % pathLength;
-        } else {
-          currentDistance = (currentDistance + 2.5) % pathLength;
-        }
-
+        currentDistance = isReversed ? (currentDistance - 2.5 + pathLength) % pathLength : (currentDistance + 2.5) % pathLength;
         try {
           const coords = pathEl.getPointAtLength(currentDistance);
           carDot.setAttribute('cx', coords.x);
@@ -1145,14 +1848,12 @@
           document.getElementById('specHeaderTitle').innerText = `Данные трассы • ${data.name}`;
           document.getElementById('specCircuitName').innerText = data.name;
         }
-        
         if (data.length) document.getElementById('specLength').innerText = `${data.length} км`;
         if (data.laps) document.getElementById('specLaps').innerText = data.laps;
         if (data.firstYear) document.getElementById('specFirstYear').innerText = data.firstYear;
         if (data.distance) document.getElementById('specDistance').innerText = `${data.distance} км`;
         if (data.fastLap) document.getElementById('specFastLap').innerText = data.fastLap;
         if (data.fastDriver) document.getElementById('specFastDriver').innerText = data.fastDriver;
-
         return true;
       } catch (error) {
         runCarAnimationOnTrack(circuitKey);
@@ -1171,7 +1872,6 @@
         };
 
         const isSprintWeekend = !!(raceData.Sprint?.date || raceData.SprintQualifying?.date);
-
         if (isSprintWeekend) {
           if (raceData.FirstPractice?.date) sessions.push({ name: "Практика 1", short: "П1", date: parseLocalDateTime(raceData.FirstPractice.date, raceData.FirstPractice.time), duration: 60 });
           const sqData = raceData.SprintQualifying || raceData.Qualifying; 
@@ -1213,10 +1913,7 @@
         return;
       }
 
-      function formatTime(d) { 
-        return d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit", hour12: false }); 
-      }
-
+      function formatTime(d) { return d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit", hour12: false }); }
       function formatDate(d) { return d.toLocaleDateString("ru-RU", { day: "2-digit", month: "short" }).replace(".", "").toUpperCase(); }
 
       function renderSessions(now) {
@@ -1226,20 +1923,8 @@
           const start = s.date.getTime();
           const end = start + (s.duration * 60000); 
           const cur = now.getTime();
-          
-          let status = "";
-          let cls = "sess-chip";
-
-          if (cur >= end) {
-            status = "✓ Завершено";
-            cls += " past";
-          } else if (cur >= start) {
-            status = "● Идёт";
-            cls += " active";
-          } else {
-            status = formatTime(s.date);
-          }
-
+          let status = cur >= end ? "✓ Завершено" : cur >= start ? "● Идёт" : formatTime(s.date);
+          let cls = "sess-chip" + (cur >= end ? " past" : cur >= start ? " active" : "");
           return `<div class="${cls}"><div class="sess-name">${formatDate(s.date)} • ${s.short}</div><div class="sess-time">${status}</div></div>`;
         }).join("");
       }
@@ -1270,138 +1955,14 @@
       updateTimer();
       globalSessionInterval = setInterval(updateTimer, 1000);
     }
-    
-    let pitstopActive = false;
-    let pitstopStartTime = 0;
-    let wheelsDone = 0;
 
-    function resetPitstopGame() {
-      pitstopActive = true;
-      pitstopStartTime = performance.now();
-      wheelsDone = 0;
-      for (let i = 1; i <= 4; i++) {
-        const w = document.getElementById(`w${i}`);
-        if (w) { w.classList.remove('done'); w.innerText = '🛞'; }
-      }
-      document.getElementById('pitstopTimerDisplay').innerText = '0.00 сек';
-      document.getElementById('pitstopTimerDisplay').style.color = 'var(--text)';
-    }
-
-    function handleWheelTap(wheelIndex) {
-      if (!pitstopActive) return;
-      const w = document.getElementById(`w${wheelIndex}`);
-      if (w && !w.classList.contains('done')) {
-        w.classList.add('done');
-        w.innerText = '✅';
-        wheelsDone++;
-        if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-
-        if (wheelsDone === 4) {
-          pitstopActive = false;
-          const totalSec = ((performance.now() - pitstopStartTime) / 1000).toFixed(2);
-          const resEl = document.getElementById('pitstopTimerDisplay');
-          resEl.innerText = `🏁 ПИТ-СТОП: ${totalSec} сек!`;
-          resEl.style.color = totalSec < 2.3 ? '#28a745' : 'var(--accent)';
-          if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-        }
-      }
-    }
-
-    function initPredictionGame(driversList) {
-      const selectEl = document.getElementById('predictionDriverSelect');
-      const activeBox = document.getElementById('predictionActiveBox');
-      const resBox = document.getElementById('predictionResultBox');
-      if (!selectEl) return;
-
-      const currentRound = window.activeRaceRound || "17"; 
-      const savedPrediction = localStorage.getItem(`f1_prediction_${currentUserId}_${currentRound}`);
-      
-      if (savedPrediction) {
-        activeBox.style.display = 'none';
-        resBox.style.display = 'block';
-        resBox.innerText = `✅ Ваш прогноз на текущую гонку: ${savedPrediction}`;
-      } else {
-        activeBox.style.display = 'block';
-        resBox.style.display = 'none';
-        selectEl.innerHTML = '<option value="">-- Выберите победителя гонки --</option>' +
-          driversList.map(d => `<option value="${d.name}">${d.name} (${d.team})</option>`).join('');
-      }
-      loadPredictionLeaderboard();
-    }
-
-    async function submitUserPrediction() {
-      const selectEl = document.getElementById('predictionDriverSelect');
-      const chosen = selectEl.value;
-      
-      if (!chosen) {
-        alert('Пожалуйста, выберите гонщика!');
-        return;
-      }
-
-      const currentRound = window.activeRaceRound || "17"; 
-      const tgUser = tg?.initDataUnsafe?.user || {};
-
-      try {
-        const res = await fetch(`${WORKER_URL}/api/prediction/submit`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            user_id: currentUserId,
-            round: currentRound,
-            driver_name: chosen,
-            first_name: tgUser.first_name || "Аноним",
-            last_name: tgUser.last_name || "",
-            username: tgUser.username || ""
-          })
-        });
-        const data = await res.json();
-
-        if (data.success) {
-          localStorage.setItem(`f1_prediction_${currentUserId}_${currentRound}`, chosen);
-          document.getElementById('predictionActiveBox').style.display = 'none';
-          const resBox = document.getElementById('predictionResultBox');
-          resBox.style.display = 'block';
-          resBox.innerText = `✅ Прогноз успешно принят сервером: ${chosen}`;
-          if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-          loadPredictionLeaderboard();
-        } else {
-          alert("Ошибка соединения. Попробуйте еще раз!");
-        }
-      } catch (e) {
-        alert("Ошибка сети при отправке на сервер.");
-      }
-    }
-
-    async function loadPredictionLeaderboard() {
-      try {
-        const res = await fetch(`${WORKER_URL}/api/prediction/leaderboard`);
-        const data = await res.json();
-        const listEl = document.getElementById('predictionLeaderboardList');
-        
-        if (!data.leaderboard || data.leaderboard.length === 0) {
-          listEl.innerHTML = 'Пока нет начисленных очков за гонки.';
-          return;
-        }
-
-        listEl.innerHTML = data.leaderboard.map((row, idx) => {
-          let displayName = `${row.first_name || ''} ${row.last_name || ''}`.trim();
-          if (!displayName) {
-            displayName = row.username ? `@${row.username}` : `Игрок ...${String(row.user_id).slice(-4)}`;
-          }
-
-          return `
-            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border);">
-              <span>#${idx + 1} ${displayName}</span>
-              <span style="font-weight:900; color:var(--accent);">${row.total_points} очков</span>
-            </div>
-          `;
-        }).join('');
-      } catch (e) {}
-    }
-
+    // =========================================================================
+    // КАТАЛОГ И ПОЛНОЕ ПЕРЕМЕЩЕНИЕ ЭЛЕМЕНТОВ В АРХИВЕ (КАТЕГОРИИ, ЭТАПЫ, СЕССИИ)
+    // =========================================================================
     let allCatalogItems = [];
     let catalogTree = {};
     let activeCatalogCategory = null;
+    let activeCatalogTitle = null;
 
     const DEFAULT_DRIVERS_DATA = [
       { pos: "01", name: "Kimi Antonelli", team: "Mercedes-AMG Petronas F1 Team", points: "302", wins: 8 },
@@ -1423,9 +1984,7 @@
       { pos: "17", name: "Nico Hülkenberg", team: "Stake F1 Team Kick Sauber / Audi", points: "16", wins: 0 },
       { pos: "18", name: "Gabriel Bortoleto", team: "Stake F1 Team Kick Sauber / Audi", points: "12", wins: 0 },
       { pos: "19", name: "Esteban Ocon", team: "Haas F1 Team", points: "10", wins: 0 },
-      { pos: "20", name: "Oliver Bearman", team: "Haas F1 Team", points: "8", wins: 0 },
-      { pos: "21", name: "Patricio O'Ward", team: "Cadillac F1 Team", points: "4", wins: 0 },
-      { pos: "22", name: "Felipe Drugovich", team: "Cadillac F1 Team", points: "2", wins: 0 }
+      { pos: "20", name: "Oliver Bearman", team: "Haas F1 Team", points: "8", wins: 0 }
     ];
 
     const DEFAULT_RACES_CALENDAR = [
@@ -1474,8 +2033,7 @@
         const adminBtn = document.getElementById('adminDirectEntryBlock');
         if (adminBtn) adminBtn.style.display = 'block';
       }
-
-      applySavedWeekendConfig();
+      initLightsBestRecord();
     }
 
     function saveUserSettings() {
@@ -1666,9 +2224,9 @@
       const nowTs = Date.now();
       let activeRace = list.find(r => {
         const raceTime = new Date(r.date + "T" + (r.time || "14:00:00")).getTime();
-        return (raceTime + 10800000) >= nowTs; 
+        return !isNaN(raceTime) && (raceTime + 10800000) >= nowTs; 
       });
-      const currentStageIndex = activeRace ? parseInt(activeRace.round) : (parseInt(window.activeRaceRound) || 17);
+      const currentStageIndex = activeRace ? parseInt(activeRace.round) : (parseInt(window.activeRaceRound) || 18);
 
       calEl.innerHTML = list.map((r, idx) => {
         const roundNum = parseInt(r.round) || (idx + 1);
@@ -1710,12 +2268,9 @@
         let driversData = DEFAULT_DRIVERS_DATA;
         if (data.drivers && data.drivers.length > 0) {
           driversData = data.drivers;
-          renderDriversList(data.drivers);
-        } else {
-          renderDriversList(DEFAULT_DRIVERS_DATA);
         }
-
-        initPredictionGame(driversData);
+        window.currentLoadedDrivers = driversData;
+        renderDriversList(driversData);
 
         if (data.constructors && data.constructors.length > 0) {
           const teamsListEl = document.getElementById('constructorsStandingsList');
@@ -1731,6 +2286,7 @@
         }
 
         if (data.races && data.races.length > 0) {
+          window.totalSeasonRounds = String(data.races.length);
           renderCalendarList(data.races);
           
           const nowTs = Date.now();
@@ -1742,7 +2298,8 @@
           if (!activeRace) activeRace = data.races[data.races.length - 1];
 
           if (activeRace) {
-            window.activeRaceRound = activeRace.round; 
+            window.activeRaceRound = String(activeRace.round);
+            window.activeRaceName = activeRace.name;
             document.getElementById('gpTitleDisplay').innerText = activeRace.name;
             document.getElementById('gpSubDisplay').innerText = `Этап ${activeRace.round} • ${activeRace.circuit}`;
             const circuitKey = activeRace.circuitId || "sepang";
@@ -1750,7 +2307,10 @@
             initDynamicWeekendSessions(activeRace);
           }
         }
+
+        initPredictionGame(driversData);
       } catch (e) {
+        window.currentLoadedDrivers = DEFAULT_DRIVERS_DATA;
         renderDriversList(DEFAULT_DRIVERS_DATA);
         renderCalendarList(DEFAULT_RACES_CALENDAR);
         initPredictionGame(DEFAULT_DRIVERS_DATA);
@@ -1763,26 +2323,8 @@
         const res = await fetch(`${WORKER_URL}/api/catalog`);
         const rows = await res.json();
         allCatalogItems = rows || [];
-        catalogTree = {};
+        buildCatalogTreeAndRender();
 
-        rows.forEach(item => {
-          const cat = item.category || 'Архив';
-          const title = item.title;
-          if (!catalogTree[cat]) catalogTree[cat] = {};
-          if (!catalogTree[cat][title]) catalogTree[cat][title] = { image: item.image, description: item.description, items: [] };
-          catalogTree[cat][title].items.push(item);
-        });
-
-        let html = '';
-        for (const catName in catalogTree) {
-          html += `
-            <div class="menu-btn" onclick="openCatalogCategory('${catName}')">
-              <div class="menu-btn-content"><span>${catName}</span></div>
-              <span style="opacity:0.4;">›</span>
-            </div>
-          `;
-        }
-        document.getElementById('catalogCategoriesContainer').innerHTML = html;
         if (isAdmin) {
           renderAdminCatalogList(allCatalogItems);
           renderAdminCategoriesOrder();
@@ -1792,24 +2334,143 @@
       }
     }
 
+    function buildCatalogTreeAndRender() {
+      catalogTree = {};
+      allCatalogItems.forEach(item => {
+        const cat = item.category || 'Архив';
+        const title = item.title;
+        if (!catalogTree[cat]) catalogTree[cat] = {};
+        if (!catalogTree[cat][title]) catalogTree[cat][title] = { image: item.image, description: item.description, items: [] };
+        catalogTree[cat][title].items.push(item);
+      });
+
+      const catNames = Object.keys(catalogTree);
+      const savedCatOrder = JSON.parse(localStorage.getItem('f1_custom_cat_order') || '[]');
+      if (savedCatOrder.length > 0) {
+        catNames.sort((a, b) => {
+          const ia = savedCatOrder.indexOf(a);
+          const ib = savedCatOrder.indexOf(b);
+          return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+        });
+      }
+
+      const container = document.getElementById('catalogCategoriesContainer');
+      if (!container) return;
+
+      container.innerHTML = '';
+      catNames.forEach((catName, idx) => {
+        const btn = document.createElement('div');
+        btn.className = 'menu-btn';
+        btn.onclick = () => openCatalogCategory(catName);
+
+        const content = document.createElement('div');
+        content.className = 'menu-btn-content';
+        content.innerHTML = `<span>${catName}</span>`;
+        btn.appendChild(content);
+
+        if (isAdmin) {
+          const ctrls = document.createElement('div');
+          ctrls.className = 'archive-reorder-ctrls';
+          ctrls.innerHTML = `
+            <button class="archive-reorder-btn" title="Вверх">⬆</button>
+            <button class="archive-reorder-btn" title="Вниз">⬇</button>
+          `;
+          const [upBtn, downBtn] = ctrls.querySelectorAll('button');
+          upBtn.onclick = (e) => { e.stopPropagation(); moveArchiveCategoryInline(catNames, idx, -1); };
+          downBtn.onclick = (e) => { e.stopPropagation(); moveArchiveCategoryInline(catNames, idx, 1); };
+          btn.appendChild(ctrls);
+        } else {
+          const arrow = document.createElement('span');
+          arrow.style.opacity = '0.4';
+          arrow.innerText = '›';
+          btn.appendChild(arrow);
+        }
+        container.appendChild(btn);
+      });
+    }
+
+    async function moveArchiveCategoryInline(catArray, idx, dir) {
+      const target = idx + dir;
+      if (target < 0 || target >= catArray.length) return;
+      const temp = catArray[idx];
+      catArray[idx] = catArray[target];
+      catArray[target] = temp;
+      localStorage.setItem('f1_custom_cat_order', JSON.stringify(catArray));
+      buildCatalogTreeAndRender();
+
+      const payloadCategories = catArray.map((cat, order) => ({ category: cat, order }));
+      try {
+        await fetch(`${WORKER_URL}/api/catalog/reorder`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
+          body: JSON.stringify({ categories: payloadCategories })
+        });
+      } catch (e) {}
+    }
+
     function openCatalogCategory(categoryName) {
       activeCatalogCategory = categoryName;
       const listEl = document.getElementById('catalogTitlesList');
       listEl.innerHTML = '';
 
-      for (const titleKey in catalogTree[categoryName]) {
+      const titles = Object.keys(catalogTree[categoryName] || {});
+      const savedTitleOrder = JSON.parse(localStorage.getItem(`f1_order_titles_${categoryName}`) || '[]');
+      if (savedTitleOrder.length > 0) {
+        titles.sort((a, b) => {
+          const ia = savedTitleOrder.indexOf(a);
+          const ib = savedTitleOrder.indexOf(b);
+          return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+        });
+      }
+
+      titles.forEach((titleKey, idx) => {
         const itemObj = catalogTree[categoryName][titleKey];
         const thumb = itemObj.image ? `<img class="menu-btn-thumb" src="${itemObj.image}">` : '';
         const btn = document.createElement('div');
         btn.className = 'menu-btn';
-        btn.innerHTML = `<div class="menu-btn-content">${thumb}<span>${titleKey}</span></div><span>›</span>`;
         btn.onclick = () => openCatalogDetails(titleKey);
+
+        const content = document.createElement('div');
+        content.className = 'menu-btn-content';
+        content.innerHTML = `${thumb}<span>${titleKey}</span>`;
+        btn.appendChild(content);
+
+        if (isAdmin) {
+          const ctrls = document.createElement('div');
+          ctrls.className = 'archive-reorder-ctrls';
+          ctrls.innerHTML = `
+            <button class="archive-reorder-btn" title="Вверх">⬆</button>
+            <button class="archive-reorder-btn" title="Вниз">⬇</button>
+          `;
+          const [upBtn, downBtn] = ctrls.querySelectorAll('button');
+          upBtn.onclick = (e) => {
+            e.stopPropagation();
+            if (idx === 0) return;
+            const t = titles[idx]; titles[idx] = titles[idx - 1]; titles[idx - 1] = t;
+            localStorage.setItem(`f1_order_titles_${categoryName}`, JSON.stringify(titles));
+            openCatalogCategory(categoryName);
+          };
+          downBtn.onclick = (e) => {
+            e.stopPropagation();
+            if (idx === titles.length - 1) return;
+            const t = titles[idx]; titles[idx] = titles[idx + 1]; titles[idx + 1] = t;
+            localStorage.setItem(`f1_order_titles_${categoryName}`, JSON.stringify(titles));
+            openCatalogCategory(categoryName);
+          };
+          btn.appendChild(ctrls);
+        } else {
+          const arrow = document.createElement('span');
+          arrow.innerText = '›';
+          btn.appendChild(arrow);
+        }
+
         listEl.appendChild(btn);
-      }
+      });
       openViewScreen('titles');
     }
 
     function openCatalogDetails(titleKey) {
+      activeCatalogTitle = titleKey;
       const data = catalogTree[activeCatalogCategory][titleKey];
       const header = document.getElementById('catalogItemHeader');
       const btnsBox = document.getElementById('catalogItemButtonsList');
@@ -1820,16 +2481,60 @@
         ${data.description ? `<div style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">${data.description}</div>` : ''}
       `;
 
+      const items = [...data.items];
+      const savedSessionOrder = JSON.parse(localStorage.getItem(`f1_order_sess_${activeCatalogCategory}_${titleKey}`) || '[]');
+      if (savedSessionOrder.length > 0) {
+        items.sort((a, b) => {
+          const ia = savedSessionOrder.indexOf(a.id);
+          const ib = savedSessionOrder.indexOf(b.id);
+          return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+        });
+      }
+
       btnsBox.innerHTML = '';
-      data.items.forEach(it => {
+      items.forEach((it, idx) => {
         const b = document.createElement('div');
         b.className = 'menu-btn';
-        b.innerHTML = `<span>${it.item}</span><span class="badge">${it.badge || '1080p'}</span>`;
         b.onclick = () => {
           if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
           tg?.openTelegramLink(`https://t.me/${BOT_USERNAME}?start=${it.code}`);
           tg?.close();
         };
+
+        const leftSpan = document.createElement('span');
+        leftSpan.innerText = it.item;
+        b.appendChild(leftSpan);
+
+        const rightWrap = document.createElement('div');
+        rightWrap.style.cssText = 'display:flex; align-items:center; gap:8px;';
+        rightWrap.innerHTML = `<span class="badge">${it.badge || '1080p'}</span>`;
+
+        if (isAdmin) {
+          const ctrls = document.createElement('div');
+          ctrls.className = 'archive-reorder-ctrls';
+          ctrls.innerHTML = `
+            <button class="archive-reorder-btn" title="Вверх">⬆</button>
+            <button class="archive-reorder-btn" title="Вниз">⬇</button>
+          `;
+          const [upBtn, downBtn] = ctrls.querySelectorAll('button');
+          upBtn.onclick = (e) => {
+            e.stopPropagation();
+            if (idx === 0) return;
+            const t = items[idx]; items[idx] = items[idx - 1]; items[idx - 1] = t;
+            localStorage.setItem(`f1_order_sess_${activeCatalogCategory}_${titleKey}`, JSON.stringify(items.map(x => x.id)));
+            openCatalogDetails(titleKey);
+          };
+          downBtn.onclick = (e) => {
+            e.stopPropagation();
+            if (idx === items.length - 1) return;
+            const t = items[idx]; items[idx] = items[idx + 1]; items[idx + 1] = t;
+            localStorage.setItem(`f1_order_sess_${activeCatalogCategory}_${titleKey}`, JSON.stringify(items.map(x => x.id)));
+            openCatalogDetails(titleKey);
+          };
+          rightWrap.appendChild(ctrls);
+        }
+
+        b.appendChild(rightWrap);
         btnsBox.appendChild(b);
       });
       openViewScreen('details');
@@ -1912,38 +2617,6 @@
         alert(`✅ Глобальная версия переключена на ${target.toUpperCase()}!`);
         loadAdminLiveStats();
       }
-    }
-
-    function saveAdminCurrentWeekendConfig() {
-      const circuitKey = document.getElementById('admActiveCircuitSelect').value;
-      const gpTitle = document.getElementById('admActiveGpTitle').value;
-      const gpSub = document.getElementById('admActiveGpSub').value;
-
-      const config = { circuitKey, gpTitle, gpSub };
-      localStorage.setItem('f1_custom_weekend_config', JSON.stringify(config));
-
-      applySavedWeekendConfig();
-      loadCircuitFromDatabase(circuitKey);
-      alert("✅ Настройки Гран-при применены к главной странице!");
-      openViewScreen('home');
-    }
-
-    function applySavedWeekendConfig() {
-      const raw = localStorage.getItem('f1_custom_weekend_config');
-      if (!raw) return;
-      try {
-        const config = JSON.parse(raw);
-        if (config.gpTitle) document.getElementById('gpTitleDisplay').innerText = config.gpTitle;
-        if (config.gpSub) document.getElementById('gpSubDisplay').innerText = config.gpSub;
-        if (config.circuitKey) loadCircuitFromDatabase(config.circuitKey);
-
-        const sel = document.getElementById('admActiveCircuitSelect');
-        const tit = document.getElementById('admActiveGpTitle');
-        const sub = document.getElementById('admActiveGpSub');
-        if (sel) sel.value = config.circuitKey;
-        if (tit) tit.value = config.gpTitle;
-        if (sub) sub.value = config.gpSub;
-      } catch (e) {}
     }
 
     function handleAdminSearch(val) {
@@ -2090,6 +2763,55 @@
       } catch (err) {}
     }
 
+    function renderAdminCategoriesOrder() {
+      const box = document.getElementById('adminCategoriesOrderList');
+      if (!box) return;
+
+      const categories = [...new Set(allCatalogItems.map(i => i.category))];
+      if (!categories.length) {
+        box.innerHTML = '<div style="font-size:12px; color:var(--text-muted); text-align:center;">Нет категорий</div>';
+        return;
+      }
+
+      box.innerHTML = categories.map((cat, idx) => `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--card-sub); padding:10px 14px; border-radius:12px; border:1px solid var(--border);">
+          <span style="font-size:14px; font-weight:800;">${cat}</span>
+          <div style="display:flex; gap:6px;">
+            <button class="icon-circle-btn" style="width:32px; height:32px; font-size:13px;" onclick="moveCategoryOrder(${idx}, -1)" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>⬆️</button>
+            <button class="icon-circle-btn" style="width:32px; height:32px; font-size:13px;" onclick="moveCategoryOrder(${idx}, 1)" ${idx === categories.length - 1 ? 'disabled style="opacity:0.3"' : ''}>⬇️</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function moveCategoryOrder(index, direction) {
+      const categories = [...new Set(allCatalogItems.map(i => i.category))];
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= categories.length) return;
+
+      const temp = categories[index];
+      categories[index] = categories[targetIndex];
+      categories[targetIndex] = temp;
+
+      localStorage.setItem('f1_custom_cat_order', JSON.stringify(categories));
+      const payloadCategories = categories.map((cat, order) => ({ category: cat, order }));
+
+      try {
+        const res = await fetch(`${WORKER_URL}/api/catalog/reorder`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
+          body: JSON.stringify({ categories: payloadCategories })
+        });
+        const data = await res.json();
+        if (data.success) {
+          loadCatalogDatabase();
+          renderAdminCategoriesOrder();
+        }
+      } catch (e) {
+        alert("Ошибка при сохранении порядка категорий");
+      }
+    }
+
     async function initAppRouting() {
       try {
         initThemeAndPreferences();
@@ -2125,124 +2847,6 @@
       }
     }
 
-    async function checkAppVersion() {
-      try {
-        const res = await fetch(`${WORKER_URL}/api/system/version`); 
-        const data = await res.json();
-        if (data.version) {
-          const versionLabel = document.getElementById('currentVersionLabel');
-          if (versionLabel) versionLabel.innerText = data.version.toUpperCase();
-        }
-      } catch (e) {}
-    }
-
-    function renderAdminCategoriesOrder() {
-      const box = document.getElementById('adminCategoriesOrderList');
-      if (!box) return;
-
-      const categories = [...new Set(allCatalogItems.map(i => i.category))];
-      
-      if (!categories.length) {
-        box.innerHTML = '<div style="font-size:12px; color:var(--text-muted); text-align:center;">Нет категорий</div>';
-        return;
-      }
-
-      box.innerHTML = categories.map((cat, idx) => `
-        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--card-sub); padding:10px 14px; border-radius:12px; border:1px solid var(--border);">
-          <span style="font-size:14px; font-weight:800;">${cat}</span>
-          <div style="display:flex; gap:6px;">
-            <button class="icon-circle-btn" style="width:32px; height:32px; font-size:13px;" onclick="moveCategoryOrder(${idx}, -1)" ${idx === 0 ? 'disabled style="opacity:0.3"' : ''}>⬆️</button>
-            <button class="icon-circle-btn" style="width:32px; height:32px; font-size:13px;" onclick="moveCategoryOrder(${idx}, 1)" ${idx === categories.length - 1 ? 'disabled style="opacity:0.3"' : ''}>⬇️</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    async function moveCategoryOrder(index, direction) {
-      const categories = [...new Set(allCatalogItems.map(i => i.category))];
-      const targetIndex = index + direction;
-      
-      if (targetIndex < 0 || targetIndex >= categories.length) return;
-
-      const temp = categories[index];
-      categories[index] = categories[targetIndex];
-      categories[targetIndex] = temp;
-
-      const payloadCategories = categories.map((cat, order) => ({ category: cat, order }));
-
-      try {
-        const res = await fetch(`${WORKER_URL}/api/catalog/reorder`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
-          body: JSON.stringify({ categories: payloadCategories })
-        });
-        const data = await res.json();
-        if (data.success) {
-          loadCatalogDatabase();
-          renderAdminCategoriesOrder();
-        }
-      } catch (e) {
-        alert("Ошибка при сохранении порядка категорий");
-      }
-    }
-
-    let f1GameState = 'IDLE'; 
-    let f1StartTime = 0;
-    let f1Timeout = null;
-    let f1Interval = null;
-
-    document.getElementById('f1LightsBtn')?.addEventListener('click', () => {
-      const btn = document.getElementById('f1LightsBtn');
-      const lights = document.querySelectorAll('.f1-light');
-      const resultDiv = document.getElementById('f1LightsResult');
-
-      if (f1GameState === 'IDLE' || f1GameState === 'FINISHED') {
-        f1GameState = 'COUNTING';
-        btn.innerText = "ЖДИ ОГНИ...";
-        btn.style.background = "#333";
-        resultDiv.innerText = "";
-  
-        lights.forEach(l => l.style.background = "#2a2a35");
-
-        let currentLight = 0;
-        f1Interval = setInterval(() => {
-          if (currentLight < 5) {
-            lights[currentLight].style.background = "#e10600";
-            currentLight++;
-          } else {
-            clearInterval(f1Interval);
-            f1GameState = 'WAITING';
-            btn.innerText = "ТУШИ СВЕТ!";
-            btn.style.background = "#e10600";
-
-            const randomDelay = Math.random() * 2000 + 1000;
-            f1Timeout = setTimeout(() => {
-              lights.forEach(l => l.style.background = "#2a2a35");
-              f1StartTime = performance.now();
-              f1GameState = 'READY_TO_CLICK';
-            }, randomDelay);
-          }
-        }, 1000);
-
-      } else if (f1GameState === 'WAITING') {
-        clearTimeout(f1Timeout);
-        clearInterval(f1Interval);
-        f1GameState = 'FALSE_START';
-        btn.innerText = "НАЖМИ ДЛЯ СТАРТА";
-        btn.style.background = "#e10600";
-        resultDiv.innerText = "❌ Фальстарт! Слишком рано.";
-        lights.forEach(l => l.style.background = "#2a2a35");
-
-      } else if (f1GameState === 'READY_TO_CLICK') {
-        const reactionTime = Math.round(performance.now() - f1StartTime);
-        f1GameState = 'FINISHED';
-        btn.innerText = "ИГРАТЬ СНОВА";
-        btn.style.background = "#e10600";
-        resultDiv.innerText = `⏱ Твое время реакции: ${reactionTime} мс!`;
-      }
-    });
-
-    checkAppVersion();
     initAppRouting();
   </script>
 </body>
