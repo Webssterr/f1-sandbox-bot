@@ -1358,8 +1358,8 @@
       tg.expand();
     }
 
-    const WORKER_URL = "https://flat-cell-8a39.ivan-petrovich378.workers.dev";
-    const BOT_USERNAME = "race_weekend_f1_bot";
+    const WORKER_URL = "https://f1-sandbox-bot.ivan-petrovich378.workers.dev/";
+    const BOT_USERNAME = "race_weekend_test_bot";
     const ADMIN_ID = "301211351";
     const TESTER_ID = "8061233590";
 
@@ -1663,13 +1663,35 @@
       if (!listEl) return;
 
       try {
+        const tgUser = tg?.initDataUnsafe?.user || {};
+        const localBonus = parseInt(localStorage.getItem(`f1_bonus_pts_${currentUserId}`) || '0');
+        if (currentUserId && currentUserId !== "user_guest") {
+          await fetch(`${WORKER_URL}/api/user/sync_bonus`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              user_id: currentUserId,
+              username: tgUser.username || '',
+              first_name: tgUser.first_name || '',
+              last_name: tgUser.last_name || '',
+              bonus_points: localBonus
+            })
+          }).catch(() => {});
+        }
+
         const res = await fetch(`${WORKER_URL}/api/prediction/leaderboard`);
         const data = await res.json();
         const rows = data.leaderboard || [];
 
         const myRecord = rows.find(r => String(r.user_id) === String(currentUserId));
+        const totalUserPts = myRecord ? (parseInt(myRecord.total_points) || 0) : localBonus;
+
         if (userPtsEl) {
-          userPtsEl.innerText = myRecord ? (myRecord.total_points || 0) : 0;
+          userPtsEl.innerText = totalUserPts;
+        }
+        const garagePtsEl = document.getElementById('garageStatPts');
+        if (garagePtsEl) {
+          garagePtsEl.innerText = `${totalUserPts} PTS`;
         }
 
         if (rows.length === 0) {
@@ -1677,8 +1699,22 @@
           return;
         }
 
+        // Вспомогательная функция для определения звания по очкам
+        function getRankTitle(pts) {
+          if (pts >= 2500) return "👑 Чемпион Мира";
+          if (pts >= 1500) return "⚡ Легенда";
+          if (pts >= 1000) return "🔥 Пилот F1";
+          if (pts >= 600) return "🏆 Пилот F2";
+          if (pts >= 300) return "🚀 Пилот F3";
+          if (pts >= 100) return "🏁 Пилот F4";
+          return "🏎️ Картингист";
+        }
+
         listEl.innerHTML = rows.map((row, idx) => {
           const isMe = String(row.user_id) === String(currentUserId);
+          const pPts = isMe ? totalUserPts : (parseInt(row.total_points) || 0);
+          const rankTitle = getRankTitle(pPts);
+
           let displayName = `${row.first_name || ''} ${row.last_name || ''}`.trim();
           if (!displayName) {
             displayName = row.username ? `@${row.username}` : `Пилот #${String(row.user_id).slice(-4)}`;
@@ -1689,11 +1725,14 @@
 
           return `
             <div class="pred-leaderboard-item ${isMe ? 'is-me' : ''}">
-              <div style="display:flex; align-items:center; gap:10px;">
+              <div style="display:flex; align-items:center; gap:10px; min-width: 0; flex: 1;">
                 <div class="pred-rank-badge ${rankClass}">${idx + 1}</div>
-                <div style="font-weight:700;">${displayName}</div>
+                <div style="min-width: 0; overflow: hidden;">
+                  <div style="font-weight:700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${displayName}</div>
+                  <div style="font-size: 11px; color: var(--text-muted); font-weight: 500; margin-top: 1px;">${rankTitle}</div>
+                </div>
               </div>
-              <div style="font-weight:900; color:var(--accent);">${row.total_points || 0} PTS</div>
+              <div style="font-weight:900; color:var(--accent); white-space: nowrap; margin-left: 8px;">${pPts} PTS</div>
             </div>
           `;
         }).join('');
@@ -1853,6 +1892,17 @@
         startBtnText.innerText = 'ПОВТОРИТЬ ПИТ-СТОП';
         note.innerHTML = `<span style="color:#34c759;">🏁 Пит-стоп завершен за ${total}s! (Штрафы: +${pitState.penalty.toFixed(1)}s)</span>`;
         if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+
+        // СОХРАНЯЕМ РЕКОРД В ТОТ ЖЕ КЛЮЧ, КОТОРЫЙ ЧИТАЕТ ГАРАЖ (f1_best_pitstop_time)
+        const prevBestPit = parseFloat(localStorage.getItem('f1_best_pitstop_time') || '999');
+        if (parseFloat(total) < prevBestPit) {
+          localStorage.setItem('f1_best_pitstop_time', total);
+        }
+        const garagePitEl = document.getElementById('garageStatPit');
+        if (garagePitEl) {
+          garagePitEl.innerText = `${localStorage.getItem('f1_best_pitstop_time')} s`;
+        }
+
         return;
       }
 
@@ -2252,12 +2302,12 @@
     // Шкала рангов от 0 до 850 очков с бонусами за достижение
     const F1_RANKS_SCALE = [
       { threshold: 0, title: "🏎️ Картингист", bonusKey: "rank_bonus_0" },
-      { threshold: 50, title: "🏁 Пилот Формулы-4", bonusKey: "rank_bonus_50" },
-      { threshold: 150, title: "🚀 Пилот Формулы-3", bonusKey: "rank_bonus_150" },
-      { threshold: 300, title: "🏆 Пилот Формулы-2", bonusKey: "rank_bonus_300" },
-      { threshold: 500, title: "🔥 Пилот Формулы-1", bonusKey: "rank_bonus_500" },
-      { threshold: 700, title: "⚡ Легенда Паддока", bonusKey: "rank_bonus_700" },
-      { threshold: 850, title: "👑 Чемпион Мира F1", bonusKey: "rank_bonus_850" }
+      { threshold: 100, title: "🏁 Пилот Формулы-4", bonusKey: "rank_bonus_50" },
+      { threshold: 300, title: "🚀 Пилот Формулы-3", bonusKey: "rank_bonus_150" },
+      { threshold: 600, title: "🏆 Пилот Формулы-2", bonusKey: "rank_bonus_300" },
+      { threshold: 1000, title: "🔥 Пилот Формулы-1", bonusKey: "rank_bonus_500" },
+      { threshold: 1500, title: "⚡ Легенда Паддока", bonusKey: "rank_bonus_700" },
+      { threshold: 2500, title: "👑 Чемпион Мира F1", bonusKey: "rank_bonus_850" }
     ];
 
     function calculateUserRank(currentPts, userId) {
@@ -2353,7 +2403,7 @@
         const res = await fetch(`${WORKER_URL}/api/prediction/leaderboard`);
         const data = await res.json();
         const me = (data.leaderboard || []).find(r => String(r.user_id) === String(currentUserId));
-        if (me) basePts = parseInt(me.total_points) || 0;
+        if (me) basePts = parseInt(me.base_points ?? me.total_points) || 0;
       } catch (e) {
         basePts = parseInt(localStorage.getItem('f1_user_pred_points') || '0');
       }
@@ -2365,7 +2415,7 @@
 
       // Вычисляем и выводим ранг (с защитой исторического максимума при обнулении сезона)
       if (rankEl) {
-        rankEl.innerText = calculateUserRank(totalUserPts);
+        rankEl.innerText = calculateUserRank(totalUserPts, currentUserId);
       }
 
       const bestReaction = localStorage.getItem('f1_best_reaction_time');
@@ -2681,15 +2731,8 @@
         catalogTree[cat][title].items.push(item);
       });
 
+      // Порядок берется напрямую из allCatalogItems (который уже отсортирован базой D1 для всех!)
       const catNames = Object.keys(catalogTree);
-      const savedCatOrder = JSON.parse(localStorage.getItem('f1_custom_cat_order') || '[]');
-      if (savedCatOrder.length > 0) {
-        catNames.sort((a, b) => {
-          const ia = savedCatOrder.indexOf(a);
-          const ib = savedCatOrder.indexOf(b);
-          return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
-        });
-      }
 
       const container = document.getElementById('catalogCategoriesContainer');
       if (!container) return;
@@ -2732,8 +2775,6 @@
       const temp = catArray[idx];
       catArray[idx] = catArray[target];
       catArray[target] = temp;
-      localStorage.setItem('f1_custom_cat_order', JSON.stringify(catArray));
-      buildCatalogTreeAndRender();
 
       const payloadCategories = catArray.map((cat, order) => ({ category: cat, order }));
       try {
@@ -2742,6 +2783,7 @@
           headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
           body: JSON.stringify({ categories: payloadCategories })
         });
+        await loadCatalogDatabase();
       } catch (e) {}
     }
 
@@ -2751,13 +2793,17 @@
       listEl.innerHTML = '';
 
       const titles = Object.keys(catalogTree[categoryName] || {});
-      const savedTitleOrder = JSON.parse(localStorage.getItem(`f1_order_titles_${categoryName}`) || '[]');
-      if (savedTitleOrder.length > 0) {
-        titles.sort((a, b) => {
-          const ia = savedTitleOrder.indexOf(a);
-          const ib = savedTitleOrder.indexOf(b);
-          return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
-        });
+
+      async function reorderTitlesInDb(newTitlesOrder) {
+        try {
+          await fetch(`${WORKER_URL}/api/catalog/reorder`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
+            body: JSON.stringify({ category: categoryName, titles: newTitlesOrder })
+          });
+          await loadCatalogDatabase();
+          openCatalogCategory(categoryName);
+        } catch (e) {}
       }
 
       titles.forEach((titleKey, idx) => {
@@ -2784,15 +2830,13 @@
             e.stopPropagation();
             if (idx === 0) return;
             const t = titles[idx]; titles[idx] = titles[idx - 1]; titles[idx - 1] = t;
-            localStorage.setItem(`f1_order_titles_${categoryName}`, JSON.stringify(titles));
-            openCatalogCategory(categoryName);
+            reorderTitlesInDb(titles);
           };
           downBtn.onclick = (e) => {
             e.stopPropagation();
             if (idx === titles.length - 1) return;
             const t = titles[idx]; titles[idx] = titles[idx + 1]; titles[idx + 1] = t;
-            localStorage.setItem(`f1_order_titles_${categoryName}`, JSON.stringify(titles));
-            openCatalogCategory(categoryName);
+            reorderTitlesInDb(titles);
           };
           btn.appendChild(ctrls);
         } else {
@@ -2814,18 +2858,22 @@
 
       header.innerHTML = `
         ${data.image ? `<img src="${data.image}" style="width:100%; max-height:220px; object-fit:cover; border-radius:18px; margin-bottom:12px;">` : ''}
-        <h2 style="margin:0 0 6px 0; font-size:22px; font-weight:900;">${titleKey}</h2>
+        <h2 style="margin:0 0 6px 0; font-weight:900; font-size:22px;">${titleKey}</h2>
         ${data.description ? `<div style="color:var(--text-muted); font-size:14px; margin-bottom:16px;">${data.description}</div>` : ''}
       `;
 
       const items = [...data.items];
-      const savedSessionOrder = JSON.parse(localStorage.getItem(`f1_order_sess_${activeCatalogCategory}_${titleKey}`) || '[]');
-      if (savedSessionOrder.length > 0) {
-        items.sort((a, b) => {
-          const ia = savedSessionOrder.indexOf(a.id);
-          const ib = savedSessionOrder.indexOf(b.id);
-          return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
-        });
+
+      async function reorderSessionsInDb(newItemsArray) {
+        try {
+          await fetch(`${WORKER_URL}/api/catalog/reorder`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Admin-Id': ADMIN_ID },
+            body: JSON.stringify({ itemIds: newItemsArray.map(x => x.id) })
+          });
+          await loadCatalogDatabase();
+          openCatalogDetails(titleKey);
+        } catch (e) {}
       }
 
       btnsBox.innerHTML = '';
@@ -2865,15 +2913,13 @@
             e.stopPropagation();
             if (idx === 0) return;
             const t = items[idx]; items[idx] = items[idx - 1]; items[idx - 1] = t;
-            localStorage.setItem(`f1_order_sess_${activeCatalogCategory}_${titleKey}`, JSON.stringify(items.map(x => x.id)));
-            openCatalogDetails(titleKey);
+            reorderSessionsInDb(items);
           };
           downBtn.onclick = (e) => {
             e.stopPropagation();
             if (idx === items.length - 1) return;
             const t = items[idx]; items[idx] = items[idx + 1]; items[idx + 1] = t;
-            localStorage.setItem(`f1_order_sess_${activeCatalogCategory}_${titleKey}`, JSON.stringify(items.map(x => x.id)));
-            openCatalogDetails(titleKey);
+            reorderSessionsInDb(items);
           };
           rightWrap.appendChild(ctrls);
         }
